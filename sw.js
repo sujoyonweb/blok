@@ -1,5 +1,5 @@
 // 1. Change this version number every time you push an update to GitHub!
-const CACHE_NAME = 'blok-cache-v14.6';
+const CACHE_NAME = 'blok-cache-v14.7';
 
 // 2. The exact list of files needed for offline mode
 // Note: We use './' (relative paths) so it works perfectly on GitHub Pages
@@ -29,7 +29,15 @@ const ASSETS_TO_CACHE = [
     
     // Media & Icons
     './assets/favicon.svg',
-    './assets/rain.mp3'
+    './assets/rain.mp3',
+
+    // Fonts (Local)
+    './assets/fonts/inter-v20-latin-regular.woff2',
+    './assets/fonts/inter-v20-latin-500.woff2',
+    './assets/fonts/inter-v20-latin-600.woff2',
+    './assets/fonts/jetbrains-mono-v24-latin-regular.woff2',
+    './assets/fonts/jetbrains-mono-v24-latin-500.woff2',
+    './assets/fonts/jetbrains-mono-v24-latin-700.woff2'
 ];
 
 // --- INSTALL EVENT: Download everything into the Vault ---
@@ -61,27 +69,30 @@ self.addEventListener('activate', (event) => {
     return self.clients.claim(); // Take control of all open tabs immediately
 });
 
-// --- FETCH EVENT: The Bulletproof Offline Engine ---
+// --- FETCH EVENT: Instant Boot (Stale-While-Revalidate) ---
 self.addEventListener('fetch', (event) => {
+    // Only handle standard GET requests
+    if (event.request.method !== 'GET') return;
+
     event.respondWith(
-        // 1. Look in the vault, but IGNORE secret browser tracking parameters
-        caches.match(event.request, { ignoreSearch: true })
-            .then((cachedResponse) => {
-                // If we found it in the vault, serve it instantly!
-                if (cachedResponse) {
-                    return cachedResponse;
+        caches.match(event.request, { ignoreSearch: true }).then((cachedResponse) => {
+            
+            // 1. The Background Internet Check
+            const fetchPromise = fetch(event.request).then((networkResponse) => {
+                // Secretly update the vault in the background for next time
+                if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+                    const responseToCache = networkResponse.clone();
+                    caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
                 }
-                
-                // 2. If it's NOT in the vault, try to get it from the network
-                return fetch(event.request).catch(() => {
-                    // 🛑 3. THE ULTIMATE SAFETY NET 🛑
-                    // If the network is completely dead (Live Server closed) 
-                    // and the app is just trying to open the main page, force it to load the UI!
-                    if (event.request.mode === 'navigate' || event.request.headers.get('accept').includes('text/html')) {
-                        return caches.match('./index.html');
-                    }
-                });
-            })
+                return networkResponse;
+            }).catch(() => {
+                // Network failed, do nothing (they are offline)
+            });
+
+            // 2. INSTANT BOOT: Return the cached version immediately if we have it!
+            // Only wait for the network if this is the absolute first time they opened the app.
+            return cachedResponse || fetchPromise;
+        })
     );
 });
 

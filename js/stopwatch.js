@@ -4,6 +4,7 @@ const Stopwatch = {
     interval: null, 
     isRunning: false, 
     laps: [],
+    lastRenderedSec: -1, // <-- Add this
 
     init() {
         // 1. Restore Laps (if any)
@@ -60,8 +61,14 @@ const Stopwatch = {
         
         this.interval = setInterval(() => {
             this.elapsed = Date.now() - this.startTime;
-            this.render();
-        }, 30); // 30ms refresh rate for smooth centiseconds
+            
+            // Only update the screen if the physical second has changed
+            const currentSec = Math.floor(this.elapsed / 1000);
+            if (currentSec !== this.lastRenderedSec) {
+                this.lastRenderedSec = currentSec;
+                this.render();
+            }
+        }, 100);
     },
 
     pause() {

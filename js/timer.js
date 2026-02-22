@@ -396,9 +396,16 @@ const Timer = {
 
         this.interval = setInterval(() => {
             const now = Date.now();
-            this.momentumSeconds = Math.floor((now - this.momentumStartTime) / 1000);
-            Storage.set(Storage.KEYS.TIMER_MOMENTUM, this.momentumSeconds);
-            this.render();
+            const newSeconds = Math.floor((now - this.momentumStartTime) / 1000);
+            
+            // 🛑 THE PERFORMANCE FIX: 
+            // Only write to the database and update the DOM if a full second has passed!
+            // This reduces CPU and Disk usage by 90%
+            if (newSeconds !== this.momentumSeconds) {
+                this.momentumSeconds = newSeconds;
+                Storage.set(Storage.KEYS.TIMER_MOMENTUM, this.momentumSeconds);
+                this.render();
+            }
         }, 100);
     },
 

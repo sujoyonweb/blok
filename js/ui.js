@@ -874,27 +874,26 @@ const UI = {
         
         if (qualityBadgeEl) {
             if (ratedSec > 0) {
-                qualityBadgeEl.classList.remove('hidden'); // Show the badge
+                qualityBadgeEl.classList.remove('hidden'); 
                 
-                // Dynamic badge styling based on your qPct thresholds
+                // Dynamic styling - Minimalist Edition (No borders, softer tints)
                 if (qPct >= 80) {
                     qualityBadgeEl.textContent = 'Excellent';
-                    qualityBadgeEl.style.color = '#4CAF50'; // Green
-                    qualityBadgeEl.style.borderColor = 'rgba(76, 175, 80, 0.3)';
-                    qualityBadgeEl.style.background = 'rgba(76, 175, 80, 0.15)';
+                    qualityBadgeEl.style.color = '#4CAF50';
+                    qualityBadgeEl.style.background = 'rgba(76, 175, 80, 0.1)'; 
+                    qualityBadgeEl.style.border = 'none';
                 } else if (qPct >= 60) {
                     qualityBadgeEl.textContent = 'Good';
-                    qualityBadgeEl.style.color = '#F5A623'; // Orange/Gold
-                    qualityBadgeEl.style.borderColor = 'rgba(245, 166, 35, 0.3)';
-                    qualityBadgeEl.style.background = 'rgba(245, 166, 35, 0.15)';
+                    qualityBadgeEl.style.color = '#F5A623';
+                    qualityBadgeEl.style.background = 'rgba(245, 166, 35, 0.1)';
+                    qualityBadgeEl.style.border = 'none';
                 } else {
                     qualityBadgeEl.textContent = 'Needs Work';
-                    qualityBadgeEl.style.color = '#FF453A'; // Red
-                    qualityBadgeEl.style.borderColor = 'rgba(255, 69, 58, 0.3)';
-                    qualityBadgeEl.style.background = 'rgba(255, 69, 58, 0.15)';
+                    qualityBadgeEl.style.color = '#FF453A';
+                    qualityBadgeEl.style.background = 'rgba(255, 69, 58, 0.1)';
+                    qualityBadgeEl.style.border = 'none';
                 }
             } else {
-                // Keep badge hidden if there is no session data yet
                 qualityBadgeEl.classList.add('hidden');
             }
         }

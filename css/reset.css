@@ -17,3 +17,43 @@ html, body {
     overscroll-behavior: none; /* 🛑 THE FIX: Prevents Android pull-to-refresh */
     -webkit-touch-callout: none; /* Prevents long-press popups */
 }
+
+/* ==========================================
+   NATIVE APP FEEL (INVISIBLE POLISH)
+   ========================================== */
+
+* {
+    /* 1. Kills the ugly blue/grey rectangle that flashes when you tap a button on mobile */
+    -webkit-tap-highlight-color: transparent; 
+}
+
+body {
+    /* 2. Kills the "elastic bounce" effect if you scroll past the top/bottom of the page */
+    overscroll-behavior-y: none; 
+}
+
+/* 3. Prevents the user from accidentally highlighting text while tapping buttons fast */
+button, .card-label, .insight-title, .preset-pill, .seg-btn, .logo {
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* 4. Changes the blinking typing cursor in your Task Input to match your new Matte Green */
+input {
+    caret-color: var(--accent-color);
+}
+
+/* ==========================================
+   HARDWARE SAFE AREAS (Protects against Notches)
+   ========================================== */
+body {
+    /* Pushes the entire app down so it doesn't hide behind the camera notch/status bar */
+    padding-top: env(safe-area-inset-top, 0px);
+    
+    /* Pushes the bottom up so it doesn't hide behind the Android/iOS swipe-up home bar */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    
+    /* Handles horizontal landscape notches */
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+}

@@ -709,6 +709,9 @@ body.mode-break.is-deep-focus .controls-section .progress-container {
 /* ==========================================
    PREMIUM INSIGHT CARDS
    ========================================== */
+/* ==========================================
+   PREMIUM INSIGHT CARDS (MINIMALIST)
+   ========================================== */
 .insights-summary-cards {
     display: flex;
     flex-direction: column;
@@ -716,13 +719,13 @@ body.mode-break.is-deep-focus .controls-section .progress-container {
 }
 
 .insight-card {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03); /* Gentle float effect */
+    border: none; /* 🛑 Removed the harsh border */
     border-radius: 12px;
-    padding: 16px;
+    padding: 16px 20px; /* Slightly wider padding to let it breathe */
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 16px;
     position: relative;
     transition: background 0.2s ease;
 }
@@ -735,10 +738,9 @@ body.mode-break.is-deep-focus .controls-section .progress-container {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 42px;
-    height: 42px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 50%;
+    width: 32px; /* Slightly smaller footprint */
+    height: 32px;
+    background: transparent; /* 🛑 Removed the boxy circle background */
     flex-shrink: 0;
 }
 
@@ -751,9 +753,9 @@ body.mode-break.is-deep-focus .controls-section .progress-container {
 }
 
 .card-label {
-    font-size: 10px;
-    color: #888;
-    letter-spacing: 1px;
+    font-size: 9px; /* 🛑 Shaved off 1px for elegance */
+    color: #666; /* 🛑 Softer grey so the numbers pop harder */
+    letter-spacing: 1.5px;
     text-transform: uppercase;
     font-family: var(--font-ui);
     font-weight: 600;
@@ -763,13 +765,14 @@ body.mode-break.is-deep-focus .controls-section .progress-container {
     font-size: 13px;
     color: #FFF;
     font-weight: 500;
+    font-family: var(--font-mono); /* Ensures numbers stay perfectly aligned */
 }
 
 /* Goal Progress Bar */
 .card-progress-bg {
     width: 100%;
     height: 4px;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.08); /* Darkened slightly */
     border-radius: 2px;
     margin-top: 4px;
     overflow: hidden;
@@ -784,28 +787,75 @@ body.mode-break.is-deep-focus .controls-section .progress-container {
 
 /* Quality Badge */
 .card-badge {
-    background: rgba(76, 175, 80, 0.15);
-    color: #4CAF50;
     padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 11px;
+    border-radius: 8px; /* 🛑 Changed from pill to a sleeker soft-square */
+    font-size: 10px;
     font-weight: 600;
-    border: 1px solid rgba(76, 175, 80, 0.3);
+    border: none; /* 🛑 Removed the border */
     white-space: nowrap;
+    letter-spacing: 0.5px;
+}
+
+/* ==========================================
+   INSIGHTS TAB: FINAL POLISH
+   ========================================== */
+
+/* 1. Make the bar graph numbers match the crisp monospace card numbers */
+.insight-row span:last-child {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: #999; /* Slightly dimmed so the white labels stand out */
+    letter-spacing: 0.5px;
+}
+
+/* 2. Upgrade the "Most time spent" text into a Smart Insight badge */
+.insight-highlight {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-top: 20px;
+    font-size: 12px;
+    color: #AAA;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Add a subtle visual cue to the insight */
+.insight-highlight::before {
+    content: "✨"; /* Adds a little spark icon automatically */
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.insight-highlight strong {
+    color: #FFF;
+    font-weight: 500;
+    letter-spacing: 0.5px;
 }
 
 /* Sections */
+
+/* ==========================================
+   INSIGHT SECTIONS (Grouped Card Look)
+   ========================================== */
 .insight-section {
-    border-bottom: 1px solid #1A1A1A; padding-bottom: 20px; margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.02); /* Very faint card background */
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin-bottom: 16px; /* Spacing between cards */
+    border: none; /* Removes the old faint dividing lines */
 }
+
+/* Push the section title a bit to make it feel like a header */
 .insight-title {
-    font-family: var(--font-ui); 
-    font-size: 11px; 
-    font-weight: 600; 
-    color: #888; 
-    letter-spacing: 1.5px; 
-    text-transform: uppercase; 
-    margin-bottom: 15px;
+    font-size: 10px;
+    color: #666;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-family: var(--font-ui);
+    font-weight: 600;
+    margin-bottom: 15px; /* Space between title and first bar */
 }
 
 /* Premium Linear Progress Bars */

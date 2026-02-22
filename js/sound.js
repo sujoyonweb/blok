@@ -339,8 +339,6 @@ const BGM = {
     }
 };
 
-// Initialize BGM on load
-document.addEventListener('DOMContentLoaded', () => BGM.init());
 
 // Initialize BGM on load
 document.addEventListener('DOMContentLoaded', () => BGM.init());
