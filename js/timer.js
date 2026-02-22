@@ -152,11 +152,35 @@ const Timer = {
     },
 
     set(h, m, s, label = 'Custom') {
-        // Prevent stacking animations if the user spam-clicks buttons
-        if (this.isAnimatingPreset) return;
+        const clock = document.getElementById('clockGroup');
+        const task = document.getElementById('taskInput');
+
+        // --- NEW: THE INTERRUPTION ENGINE ---
+        // If they click a new preset while the old one is still animating,
+        // instantly kill the old timeouts and reset the visual state!
+        if (this.isAnimatingPreset) {
+            clearTimeout(this.swapTimeout);
+            clearTimeout(this.inhaleTimeout);
+            clearTimeout(this.cleanupTimeout);
+            
+            if (clock) {
+                clock.style.transition = 'none'; 
+                clock.style.filter = '';
+                clock.style.transform = '';
+                clock.style.opacity = '1';
+                void clock.offsetHeight; // Force browser to register the reset
+            }
+            if (task) {
+                task.style.transition = 'none';
+                task.style.transform = '';
+                task.style.removeProperty('opacity');
+                void task.offsetHeight;
+            }
+        }
+        
         this.isAnimatingPreset = true;
 
-        // THE FIX: Tell the reset function to NOT highlight the old preset
+        // Tell the reset function to NOT highlight the old preset
         this.reset(true); 
 
         this.duration = (h * 3600) + (m * 60) + s;
@@ -173,8 +197,6 @@ const Timer = {
         Storage.set(Storage.KEYS.LAST_PRESET, { time: this.duration, label: label });
 
         // --- FAST CINEMATIC SWAP ---
-        const clock = document.getElementById('clockGroup');
-        const task = document.getElementById('taskInput');
         
         // 1. Exhale Fast (0.2s)
         if (clock) {
@@ -190,7 +212,7 @@ const Timer = {
         }
 
         // 2. Logic Swap (at 0.25s)
-        setTimeout(() => {
+        this.swapTimeout = setTimeout(() => {
             if (typeof UI !== 'undefined') {
                 UI.setBreakMode(this.sessionPhase === 'break');
                 UI.setPlayState(false);
@@ -220,7 +242,7 @@ const Timer = {
             }
 
             // 3. Inhale Fast (at 0.3s)
-            setTimeout(() => {
+            this.inhaleTimeout = setTimeout(() => {
                 if (clock) {
                     clock.style.transition = 'all 0.4s cubic-bezier(0.19, 1, 0.22, 1)';
                     clock.style.transform = 'translateY(0)';
@@ -235,7 +257,7 @@ const Timer = {
                 }
                 
                 // 4. Cleanup
-                setTimeout(() => {
+                this.cleanupTimeout = setTimeout(() => {
                     if (clock) {
                         clock.style.transition = '';
                         clock.style.filter = '';
@@ -384,7 +406,6 @@ const Timer = {
             Storage.set('blok_session_id', this.sessionId);
             
             Sound.play('alarm');
-            Notify.send("Target Reached! 🔥", "You are now in Momentum mode.");
         }
 
         // Calculate the anchor time (this math applies perfectly whether we are 
@@ -530,9 +551,13 @@ const Timer = {
 
             this.pause();
             
-            // Only save to history if we were currently in a focus session when stopped
-            if (this.sessionPhase === 'focus' && elapsedThisSession > 0) {
-                 this.saveToHistory(elapsedThisSession);
+            // FIX: Ensure we save BOTH Focus and Break fragments if stopped manually
+            if (elapsedThisSession > 0) {
+                if (this.sessionPhase === 'focus') {
+                    this.saveToHistory(elapsedThisSession);
+                } else {
+                    this.saveBreakToJournal(elapsedThisSession);
+                }
             }
 
             // SMART STRING FORMATTING: Shows "< 1m" instead of "0m" for short tests
@@ -603,7 +628,14 @@ const Timer = {
         this.isRunning = false;
         clearInterval(this.interval);
         const timeToSave = discardExtra ? this.duration : (this.duration + this.momentumSeconds);
-        this.saveToHistory(timeToSave);
+        
+        // FIX: Check if the momentum session was a break before saving!
+        if (this.currentLabel && this.currentLabel.toLowerCase().includes('break')) {
+            this.saveBreakToJournal(timeToSave);
+        } else {
+            this.saveToHistory(timeToSave);
+        }
+        
         this.reset();
     },
 
@@ -654,9 +686,6 @@ const Timer = {
             this.saveSessionTrackers();
 
             Sound.play('alarm'); 
-            let notifTitle = this.sessionPhase === 'focus' ? "Session Complete! ⏳" : "Break Over! 🚀";
-            let notifBody = this.sessionPhase === 'focus' ? "Starting your break automatically." : "Time to get back to work.";
-            Notify.send(notifTitle, notifBody);
             if (typeof UI !== 'undefined') UI.setSuccessState(true); 
 
             // --- THE "DEEP BREATH" (NO-SCALE PERFECT MASKING) ---
@@ -681,6 +710,11 @@ const Timer = {
             // Phase 2: THE "DARK ZONE" SWAP (at 650ms)
             setTimeout(() => {
                 if (typeof UI !== 'undefined') UI.setSuccessState(false); 
+
+                // FIX: Generate a brand new Session ID for the next Auto Flow phase 
+                // so the anti-spam firewall doesn't block it!
+                this.sessionId = Date.now().toString();
+                Storage.set('blok_session_id', this.sessionId);
 
                 if (this.sessionPhase === 'focus') {
                     this.sessionPhase = 'break';
@@ -775,9 +809,6 @@ const Timer = {
             const isBreak = this.currentLabel.toLowerCase().includes('break');
             
             Sound.play('alarm'); 
-            let stdTitle = isBreak ? "Break Over! 🚀" : "Session Complete! ⏳";
-            let stdBody = isBreak ? "Time to get back to work." : "Great focus. Time to take a break.";
-            Notify.send(stdTitle, stdBody);
             if (typeof UI !== 'undefined') UI.setSuccessState(true); 
 
             if (!isBreak && this.duration >= GRACE_PERIOD_SEC) { 

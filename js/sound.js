@@ -63,53 +63,63 @@ class SoundEngine {
             });
 
         } else if (type === 'click') {
-            // Premium Mechanical "Thud"
+            // Apple Force-Touch Style Mechanical Click
             const osc = this.ctx.createOscillator();
             const gain = this.ctx.createGain();
             osc.connect(gain);
             gain.connect(this.ctx.destination);
             
-            osc.type = 'sine';
+            // Back to a clean, smooth Sine wave
+            osc.type = 'sine'; 
             
-            // 🛑 THE FIX: 400Hz creates a deep, tactile physical sensation
-            osc.frequency.setValueAtTime(400, now);
+            // THE SNAP: Start high (600Hz) and instantly drop to deep bass (100Hz) in 0.02 seconds
+            // This creates the physical "tap" sound instead of a digital beep
+            osc.frequency.setValueAtTime(600, now);
+            osc.frequency.exponentialRampToValueAtTime(100, now + 0.02);
             
-            // 🛑 THE FIX: Lower volume (0.02) and ultra-fast fade (0.03s) for a sharp snap
-            gain.gain.setValueAtTime(0.02, now);
+            // THE THUD: Volume hits 6% (perfect for 60% phone volume) and fades out instantly
+            gain.gain.setValueAtTime(0.06, now);
             gain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
             
             osc.start(now);
-            osc.stop(now + 0.03);
+            osc.stop(now + 0.04);
         }
     }
 
     triggerHaptic(type) {
-        // First check if the device even supports vibration
         if (!this.hasHaptics) return;
         
-        // --- CHECK SETTINGS ---
-        // If the user turned off Haptics in the settings, exit immediately.
         const isHapticsOn = Storage.get(Storage.KEYS.HAPTICS_ON, true);
         if (!isHapticsOn) return;
 
         try {
-            if (type === 'alarm') {
-                /*
-                 * EXTENDED HEARTBEAT
-                 * Matches the new longer sound profile.
-                 * Pattern: Thump-Thump ... Thump-Thump ... Thump-Thump
-                 */
+            if (type === 'click') {
+                // YOUR PREFERRED CLICK: 
+                // A crisp, short 10ms tap that feels like a physical glass/metal button.
+                // (If you want it slightly heavier, you can change this 10 to a 15 or 20)
+                navigator.vibrate(10); 
+                
+            } else if (type === 'alarm') {
+                // THE DESK-SAFE CRESCENDO: 
+                // Gentle enough for the hand, heavy enough to resonate on a desk stand.
                 navigator.vibrate([
-                    200, 100, 200,   // First Heartbeat
-                    500,             // Pause
-                    200, 100, 200,   // Second Heartbeat
-                    500,             // Pause
-                    200, 100, 200    // Final Heartbeat
-                ]);
-            } else {
-                navigator.vibrate(10); // Crisp Tick
+                    15, 150,  // Light tick, pause
+                    15, 150,  // Light tick, pause
+                    40, 600,  // Deep thud, long pause
+                    
+                    15, 150,  // Light tick, pause
+                    15, 150,  // Light tick, pause
+                    40        // Deep thud
+                ]); 
+                
+            } else if (type === 'lap' || type === 'discard') {
+                // THE DOUBLE TAP:
+                // A quick flutter for secondary actions like laps
+                navigator.vibrate([15, 50, 15]);
             }
-        } catch (e) {}
+        } catch (e) {
+            console.log("Haptics not supported or blocked by browser.");
+        }
     }
 
 } // End of SoundEngine Object

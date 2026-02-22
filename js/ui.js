@@ -43,7 +43,6 @@ const UI = {
         btnSettings: document.getElementById('btnSettings'),
         btnCloseSettings: document.getElementById('btnCloseSettings'),
         themeBtns: document.querySelectorAll('#themeSelector .seg-btn'),
-        toggleNotifications: document.getElementById('toggleNotifications'),
         toggleSound: document.getElementById('toggleSound'),
         toggleHaptics: document.getElementById('toggleHaptics'),
         toggleAwake: document.getElementById('toggleAwake'),
@@ -338,42 +337,26 @@ const UI = {
     },
 
     switchLayout(mode) {
-        const viewport = document.querySelector('.viewport');
         const isTimer = mode === 'timer';
 
-        // --- NEW: Spatial Slide Animation ---
-        viewport.classList.remove('slide-from-left', 'slide-from-right');
-        void viewport.offsetWidth; // Magic trick: Forces the browser to reset the animation
-        
-        // Slide in from the direction of the tab being clicked
-        viewport.classList.add(isTimer ? 'slide-from-left' : 'slide-from-right');
-        // --------------------------------------
-        
-        // 1. Move the Header Toggle Indicator
-        this.els.track.style.transform = isTimer ? 'translateX(0)' : 'translateX(100%)';
-        this.els.tabs.timer.classList.toggle('active', isTimer);
-        this.els.tabs.stopwatch.classList.toggle('active', !isTimer);
+        // 1. Move the Header Toggle Indicator (CORE LOGIC FIRST)
+        if (this.els.track) this.els.track.style.transform = isTimer ? 'translateX(0)' : 'translateX(100%)';
+        if (this.els.tabs.timer) this.els.tabs.timer.classList.toggle('active', isTimer);
+        if (this.els.tabs.stopwatch) this.els.tabs.stopwatch.classList.toggle('active', !isTimer);
         
         // 2. Set the Body Class
         document.body.classList.remove('mode-timer', 'mode-stopwatch');
         document.body.classList.add(isTimer ? 'mode-timer' : 'mode-stopwatch');
         
-        // 3. Clean Layout Swap (Let the horizontal Spatial Slide handle the movement)
-        if (this.els.menu.wrapper) {
-            this.els.menu.wrapper.classList.remove('slide-away'); // Clear any stuck animations
-            this.els.menu.wrapper.classList.toggle('hidden', !isTimer);
-        }
-        
-        if (this.els.laps) {
-            this.els.laps.classList.remove('slide-away'); // Clear any stuck animations
-            this.els.laps.classList.toggle('hidden', isTimer);
-        }
+        // 3. Show/Hide Presets and Laps
+        if(this.els.menu.wrapper) this.els.menu.wrapper.classList.toggle('hidden', !isTimer);
+        if(this.els.laps) this.els.laps.classList.toggle('hidden', isTimer);
         
         // 4. Manage Controls (Momentum vs Lap)
         if (isTimer) {
-            this.els.controls.lap.classList.add('hidden');
+            if (this.els.controls.lap) this.els.controls.lap.classList.add('hidden');
         } else {
-            this.els.controls.lap.classList.remove('hidden'); 
+            if (this.els.controls.lap) this.els.controls.lap.classList.remove('hidden'); 
             if (this.els.controls.momentum) this.els.controls.momentum.classList.add('hidden');
             if (this.els.clockGroup) this.els.clockGroup.classList.remove('momentum');
         }
@@ -388,13 +371,45 @@ const UI = {
             const key = isTimer ? 'blok_task_timer' : 'blok_task_stopwatch';
             const savedText = localStorage.getItem(key) || '';
             
-            // THE REFRESH FIX: Don't overwrite the Break message if we are in a Break!
             if (document.body.classList.contains('mode-break')) {
                 this.els.taskInput.value = "Enjoy your break...";
             } else {
                 this.els.taskInput.value = savedText;
                 this.els.taskInput.placeholder = isTimer ? "What are you working on?" : "What are you tracking?";
             }
+        }
+
+        // 7. --- THE SPATIAL SLIDE ANIMATION ---
+        // Placed at the very end in a try/catch block so it can NEVER break your tabs!
+        try {
+            const viewport = document.querySelector('.viewport');
+            const footer = document.querySelector('.footer');
+            
+            if (viewport && footer) {
+                // Clear any stuck classes
+                viewport.classList.remove('slide-from-left', 'slide-from-right');
+                footer.classList.remove('slide-from-left', 'slide-from-right');
+                
+                // Force browser reflow
+                void viewport.offsetWidth; 
+                void footer.offsetWidth;
+                
+                // Add the animation
+                const slideClass = isTimer ? 'slide-from-left' : 'slide-from-right';
+                viewport.classList.add(slideClass);
+                footer.classList.add(slideClass);
+
+                // Instantly clean up when finished
+                const cleanup = (e) => {
+                    e.target.classList.remove('slide-from-left', 'slide-from-right');
+                    e.target.removeEventListener('animationend', cleanup);
+                };
+                
+                viewport.addEventListener('animationend', cleanup);
+                footer.addEventListener('animationend', cleanup);
+            }
+        } catch (err) {
+            console.error("Animation skipped to protect core UI:", err);
         }
     },
 
@@ -441,33 +456,46 @@ const UI = {
         const btnCustom = document.getElementById('btnCustomOpen');
         if (btnCustom) btnCustom.classList.remove('active');
 
+        let activeBtn = null;
+
         // 2. Read the Timer's internal brain
         if (typeof Timer !== 'undefined') {
             
             // --- AUTO FLOW FIX ---
-            // Auto Flow explicitly names its breaks "Break". 
-            // (Manual clicks are named "Short Break" or "Long Break").
-            // If it's an Auto Flow break, leave the menu un-highlighted.
             if (Timer.autoFlowEnabled && Timer.sessionPhase === 'break' && Timer.currentLabel === 'Break') {
+                // Fade out the floating line during Auto Flow breaks
+                const line = document.getElementById('presetHighlightLine');
+                if (line) line.style.opacity = '0';
                 return; 
             }
 
             // --- CUSTOM TIME FIX ---
-            // If the engine knows you picked a Custom time, force the Custom button highlight 
-            // and stop searching, ignoring the 5m or 10m overlap.
             if (Timer.currentLabel === 'Custom') {
-                if (btnCustom) btnCustom.classList.add('active');
-                return;
+                activeBtn = btnCustom;
             }
         }
 
         // 3. Standard fallback matching (for Pomodoro, Study, etc.)
-        const match = Array.from(this.els.presets).find(p => parseInt(p.dataset.m) === min && hr === 0 && sec === 0);
+        if (!activeBtn) {
+            const match = Array.from(this.els.presets).find(p => parseInt(p.dataset.m) === min && hr === 0 && sec === 0);
+            activeBtn = match || btnCustom;
+        }
         
-        if (match) {
-            match.classList.add('active');
-        } else if (btnCustom) {
-            btnCustom.classList.add('active');
+        // 4. Apply the class AND animate the floating line!
+        if (activeBtn) {
+            activeBtn.classList.add('active');
+            
+            const line = document.getElementById('presetHighlightLine');
+            if (line) {
+                line.style.opacity = '1'; // Make sure it's visible
+                
+                // Calculate the exact bottom edge of the button
+                const topPos = activeBtn.offsetTop + activeBtn.offsetHeight - 2;
+                
+                // Glide the line to the target button
+                line.style.transform = `translate(${activeBtn.offsetLeft}px, ${topPos}px)`;
+                line.style.width = `${activeBtn.offsetWidth}px`;
+            }
         }
     },
 
@@ -650,6 +678,13 @@ const UI = {
     buildMenu() {
         if(!this.els.menu.container) return;
         this.els.menu.container.innerHTML = '';
+        // --- NEW: Inject the floating highlight line ---
+        const highlightLine = document.createElement('div');
+        highlightLine.id = 'presetHighlightLine';
+        highlightLine.className = 'preset-highlight-line';
+        this.els.menu.container.appendChild(highlightLine);
+        // -----------------------------------------------
+
         Config.PRESETS.forEach(p => {
             const btn = document.createElement('button');
             btn.className = 'preset-pill';
@@ -708,10 +743,6 @@ const UI = {
         // <-- NEW AWAKE TOGGLE LOGIC -->
         const awakeOn = Storage.get(Storage.KEYS.AWAKE_ON, true);
         if (this.els.toggleAwake) this.els.toggleAwake.classList.toggle('active', awakeOn);
-
-        // <-- NEW NOTIFICATION LOGIC -->
-        const notifOn = Storage.get(Storage.KEYS.NOTIFICATIONS_ON, false);
-        if (this.els.toggleNotifications) this.els.toggleNotifications.classList.toggle('active', notifOn);
         
         const autoFlowOn = Storage.get(Storage.KEYS.AUTOFLOW_ENABLED, false);
         if (this.els.toggleAutoFlow) this.els.toggleAutoFlow.classList.toggle('active', autoFlowOn);
