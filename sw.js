@@ -1,5 +1,5 @@
 // 1. Change this version number every time you push an update to GitHub!
-const CACHE_NAME = 'blok-cache-v14.7';
+const CACHE_NAME = 'blok-cache-v14.8';
 
 // 2. The exact list of files needed for offline mode
 // Note: We use './' (relative paths) so it works perfectly on GitHub Pages
@@ -101,4 +101,5 @@ self.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'SKIP_WAITING') {
         self.skipWaiting();
     }
+
 });
