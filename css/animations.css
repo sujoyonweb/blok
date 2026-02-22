@@ -1,0 +1,131 @@
+/* =========================================
+   VISIBILITY UTILITIES
+   ========================================= */
+
+/* CRITICAL FIX: Exclude Modals and Toasts from being instantly 'nuked'.
+   By default, .hidden sets display:none. We must prevent this for elements
+   that need to animate their exit (slide/fade out).
+*/
+.hidden:not(.modal-backdrop):not(.toast) { 
+    display: none !important; 
+}
+
+/* =========================================
+   KEYFRAME ANIMATIONS (Keep existing)
+   ========================================= */
+
+@keyframes fadeIn { 
+    from { opacity: 0; transform: translateY(10px); } 
+    to { opacity: 1; transform: translateY(0); } 
+}
+.lap-row { animation: fadeIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+
+.icon-play, .icon-pause { transition: opacity 0.2s ease, transform 0.2s ease; }
+
+@keyframes popIn { 
+    0% { opacity: 0; transform: scale(0.8); } 
+    100% { opacity: 1; transform: scale(1); } 
+}
+.btn-circle:not(.hidden) { animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+/* =========================================
+   v8.2 BREATHING UI (The Heartbeat)
+   ========================================= */
+
+@keyframes breathe {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; } /* Fades out to 50% brightness */
+    100% { opacity: 1; }
+}
+
+/* Optional: A very subtle glow pulse for the digits */
+@keyframes pulseGlow {
+    0% { text-shadow: 0 0 0 rgba(255,255,255,0); }
+    50% { text-shadow: 0 0 15px rgba(255,255,255,0.15); }
+    100% { text-shadow: 0 0 0 rgba(255,255,255,0); }
+}
+
+
+/* =========================================
+   v8.5 SMOOTH NUMBER TRANSITIONS
+   ========================================= */
+
+/* =========================================
+   v8.6 KINETIC PHYSICS ENGINE (Gravity + Blur)
+   ========================================= */
+
+/* 1. FALLING (For Timer - Countdown) */
+/* Starts high, slightly blurred, and falls into place with weight */
+@keyframes gravity-fall {
+    0% {
+        opacity: 0;
+        transform: translateY(-35px) scale(0.9); /* Starts higher */
+        filter: blur(4px); /* Motion Blur */
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0px); /* Sharpens on impact */
+    }
+}
+
+/* 2. RISING (For Stopwatch - Count Up) */
+/* Starts low, slightly blurred, and floats up */
+@keyframes anti-gravity-rise {
+    0% {
+        opacity: 0;
+        transform: translateY(35px) scale(0.9); /* Starts lower */
+        filter: blur(4px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0px);
+    }
+}
+
+/* --- THE TRIGGER CLASSES (Managed by JS) --- */
+
+.tick-fall {
+    display: inline-block;
+    will-change: transform, opacity, filter;
+    /* The "Apple Spring" Curve: Fast start, soft, slightly bouncy landing */
+    animation: gravity-fall 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.tick-rise {
+    display: inline-block;
+    will-change: transform, opacity, filter;
+    animation: anti-gravity-rise 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* =========================================
+   NEW SESSION COMPLETE ANIMATION (v9.0)
+   ========================================= */
+@keyframes pulse-green {
+    0% { filter: drop-shadow(0 0 0px var(--accent-color)); }
+    50% { filter: drop-shadow(0 0 20px var(--accent-color)); }
+    100% { filter: drop-shadow(0 0 0px var(--accent-color)); }
+}
+.session-complete-pulse {
+    /* Reuse the existing 'pulse-green' keyframes */
+    /* 1.5s duration | ease-in-out timing | 1 iteration (Run ONCE) */
+    animation: pulse-green 1.5s ease-in-out 1; 
+    
+    /* Ensure the ring is visible during the animation */
+    stroke: var(--accent-color) !important;
+    opacity: 1 !important;
+    filter: grayscale(0%);
+    -webkit-filter: grayscale(0%);
+}
+body.is-deep-focus .controls-section .progress-container .progress-ring.session-complete-pulse {
+    filter: none !important; /* Let the animation colors shine through */
+    filter: grayscale(none) !important;
+}
+
+/* The Text Glow */
+body.timer-complete #clockGroup {
+    color: #FFFFFF;
+    text-shadow: 0 0 25px rgba(255, 255, 255, 0.5);
+    transition: all 0.3s ease;
+}

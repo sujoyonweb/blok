@@ -1,0 +1,46 @@
+:root {
+    /* =========================================
+       🌞 DAY MODE (Neutral, High-Contrast Black)
+       ========================================= */
+    --bg-color: #000000;
+    --surface-color: #1C1C1E;
+    
+    --text-main: #FFFFFF;
+    --text-dim: #555555;
+    
+    /* Brand Accents */
+    --accent-color: #4CAF50;
+    --momentum-color: #A855F7; 
+    --break-color: #5EEAD4; /* Restorative Teal for Break Mode */
+    
+    --btn-bg: #1A1A1A;
+    --btn-hover: #252525;
+    
+    /* --- DIMENSIONS --- */
+    --app-max-width: 900px;
+    --header-height: 120px;
+    --footer-height: 140px;
+    
+    /* --- TYPOGRAPHY --- */
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-ui: 'Inter', sans-serif;
+    
+    --font-size-clock-desktop: 140px;
+    --font-size-clock-mobile: 15vw;
+}
+
+[data-theme="night"] {
+    /* =========================================
+       🌙 NIGHT MODE (Warm, Low-Strain Charcoal)
+       ========================================= */
+    --bg-color: #060504;      
+    --surface-color: #151412; 
+    
+    --text-main: #EAE8E3;     
+    --text-dim: #7E7A74;      
+    
+    --btn-bg: #151412;
+    --btn-hover: #1E1C1A;
+    
+    /* Accent colors remain the same so the app's identity doesn't break */
+}

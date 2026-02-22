@@ -1,0 +1,877 @@
+:root {
+    /* ... other variables ... */
+    --momentum-color: #A855F7; /* Electric Violet */
+}
+
+/* =========================================
+   BUTTONS
+   ========================================= */
+.btn-circle {
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.1s ease, background-color 0.2s;
+    will-change: transform;
+    z-index: 2;
+}
+.btn-circle:active { transform: scale(0.92); }
+
+.primary { width: 80px; height: 80px; background: var(--btn-bg); color: #FFF; }
+.primary:hover { background: var(--btn-hover); }
+
+.secondary { width: 56px; height: 56px; background: transparent; border: 1px solid #333; color: #AAA; }
+.secondary:hover { border-color: #666; color: #FFF; }
+
+
+/* =========================================
+   PROGRESS RING
+   ========================================= */
+.progress-container {
+    position: relative;
+    width: 92px;
+    height: 92px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* CONTAINER FIX */
+.progress-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-90deg);
+    pointer-events: none;
+    
+    /* FIX FOR SQUARISH CLIPPING */
+    overflow: visible !important; 
+}
+
+/* SHARED RING STYLES */
+.progress-ring-fill {
+    transition: stroke-dashoffset 0.5s ease, filter 0.3s ease;
+    stroke-dasharray: 276.46; /* 2 * PI * 44 */
+    stroke-dashoffset: 276.46; /* Start Empty */
+}
+
+/* COLORS & GLOWS */
+.ring-green {
+    stroke: var(--accent-color); /* Your Green */
+}
+/* Only glow when fully complete */
+.ring-green.glowing {
+    filter: drop-shadow(0 0 8px var(--accent-color));
+}
+
+.ring-purple {
+    stroke: #9D50FF; /* Momentum Purple */
+}
+.ring-purple.glowing {
+    filter: drop-shadow(0 0 8px #9D50FF);
+}
+
+.ring-gold {
+    stroke: #FFD700; /* Double Goal Gold */
+}
+.ring-gold.glowing {
+    filter: drop-shadow(0 0 10px #FFD700);
+}
+
+
+/* =========================================
+   PRESETS MENU
+   ========================================= */
+.presets-wrapper {
+    width: fit-content;
+    max-width: 100%;
+    display: flex;
+    justify-content: center;
+    border-bottom: 1px solid #222;
+    margin: 0 auto 50px auto;
+    padding-bottom: 0;
+    overflow: hidden;
+}
+
+.presets-scroll {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding-bottom: 20px;
+    margin-bottom: -20px;
+    scrollbar-width: none;
+}
+.presets-scroll::-webkit-scrollbar { display: none; }
+
+.preset-pill {
+    background: none;
+    border: none;
+    color: #444;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    white-space: nowrap;
+    cursor: pointer;
+    position: relative;
+    padding: 10px 0;
+    transition: color 0.3s;
+}
+.preset-pill.active { color: #FFF; font-weight: 700; }
+.preset-pill.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; width: 100%; height: 2px;
+    background: var(--accent-color);
+}
+
+
+/* =========================================
+   LAPS
+   ========================================= */
+.lap-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1A1A1A; font-size: 13px; color: #666; }
+
+
+/* =========================================
+   MODALS (UNIVERSAL PREMIUM ANIMATION)
+   ========================================= */
+
+/* 1. BACKDROP */
+.modal-backdrop {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 100;
+    
+    /* FORCE FLEX: Keeps the modal centered even during the exit animation */
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    
+    background: rgba(0, 0, 0, 0.95);
+    
+    /* Base State: Visible */
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    
+    /* Transition: Opacity fades over 0.5s. Visibility flips instantly on open. */
+    transition: opacity 0.5s cubic-bezier(0.19, 1, 0.22, 1), 
+                visibility 0s linear 0s;
+}
+
+@supports (backdrop-filter: blur(10px)) {
+    .modal-backdrop { background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px); }
+}
+
+/* 2. BACKDROP EXIT STATE (Triggered by .hidden) */
+.modal-backdrop.hidden {
+    opacity: 0;
+    
+    /* THE TRICK: Wait 0.5s for the fade to finish before hiding from the DOM */
+    visibility: hidden;
+    pointer-events: none;
+    
+    transition: opacity 0.5s cubic-bezier(0.19, 1, 0.22, 1), 
+                visibility 0s linear 0.5s;
+}
+
+/* 3. MODAL CARD */
+.modal {
+    background: #0E0E0E; 
+    border: 1px solid #333; 
+    width: 90%; 
+    max-width: 380px;
+    border-radius: 24px; padding: 30px; text-align: center;
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
+    
+    /* OPTIMIZATION: Puts the modal on its own GPU layer to prevent jitter */
+    will-change: transform, opacity;
+    
+    /* Base State: Centered & Full Size */
+    transform: scale(1) translateY(0);
+    opacity: 1;
+    
+    /* Apple-Style Physics Curve (Matches Momentum Toast) */
+    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1), 
+                opacity 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    max-height: 85dvh;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+.modal::-webkit-scrollbar {
+    display: none;
+}
+
+/* 4. MODAL CARD EXIT STATE (The 80px Slide) */
+.modal-backdrop.hidden .modal {
+    opacity: 0;
+    /* Slide down 80px and shrink slightly for that "dropping away" feel */
+    transform: scale(0.95) translateY(80px);
+}
+
+/* Inner Content Styles */
+.modal-header {
+    color: #555; font-size: 12px; letter-spacing: 2px; margin-bottom: 20px;
+    font-family: var(--font-ui); text-transform: uppercase;
+}
+
+.modal-close-icon {
+    position: absolute; top: 15px; right: 15px;
+    background: none; border: none; color: #444;
+    font-size: 24px; line-height: 1; cursor: pointer;
+    padding: 5px; transition: color 0.2s;
+}
+.modal-close-icon:hover { color: #FFF; }
+
+.picker-row { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 30px; }
+.picker-col input {
+    width: 60px; height: 70px; background: #151515; border: 1px solid #333;
+    border-radius: 12px; color: #FFF; font-family: var(--font-mono); font-size: 28px;
+    text-align: center; outline: none;
+}
+.picker-col input:focus { border-color: var(--accent-color); }
+.picker-sep { font-size: 20px; color: #333; margin-top: 10px; }
+
+.modal-actions { display: flex; gap: 15px; }
+.btn-modal {
+    flex: 1; padding: 14px; border-radius: 12px; border: none;
+    cursor: pointer; font-family: var(--font-mono); font-weight: 700; font-size: 14px;
+}
+.cancel { background: #222; color: #FFF; }
+.start { background: var(--accent-color); color: #000; }
+
+
+/* =========================================
+   GOAL SETTER
+   ========================================= */
+.goal-wrapper {
+    margin-top: 25px; padding-top: 20px; border-top: 1px solid #222;
+}
+.goal-label {
+    display: block; color: #555; font-size: 10px; letter-spacing: 1px;
+    font-family: var(--font-ui); text-transform: uppercase; margin-bottom: 10px;
+}
+.goal-input-row {
+    display: flex; justify-content: center; align-items: center; gap: 20px;
+}
+.btn-goal {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: #1A1A1A; border: none; color: #FFF;
+    font-size: 20px; cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+    padding: 0;
+}
+#btnGoalDec {
+    padding-bottom: 4px !important; 
+}
+#btnGoalInc {
+    /* Usually fine, but sometimes needs a 1px lift */
+    padding-bottom: 1px !important; 
+}
+.btn-goal:hover { background: #333; }
+#goalValue {
+    font-size: 24px; color: #FFF; font-family: var(--font-mono); width: 40px;
+}
+
+
+/* =========================================
+   CHART
+   ========================================= */
+.chart-wrapper {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    height: 140px; padding: 10px 10px 0; border-bottom: 1px solid #222;
+}
+.chart-col { 
+    display: flex; flex-direction: column; align-items: center; 
+    width: 28px; height: 100%; justify-content: flex-end; 
+}
+.chart-value {
+    font-size: 11px; color: #FFFFFF; font-family: var(--font-mono);
+    font-weight: 500; letter-spacing: 0.5px; margin-bottom: 4px;
+    min-height: 14px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+.chart-bar {
+    width: 8px; background: #222; border-radius: 4px;
+    min-height: 4px; transition: height 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.chart-bar.today { background: var(--accent-color); box-shadow: 0 0 12px rgba(76, 175, 80, 0.3); }
+.chart-label { 
+    font-size: 10px; color: #666; font-family: var(--font-ui); 
+    text-transform: uppercase; margin-top: 6px; font-weight: 600;
+}
+
+
+/* =========================================
+   V9.3 MOMENTUM EXTENSIONS & TOAST
+   ========================================= */
+#btnMomentum.active {
+    color: var(--momentum-color); 
+    border-color: var(--momentum-color);
+    box-shadow: 0 0 10px rgba(255, 149, 0, 0.2);
+}
+
+.digit-group.momentum {
+    color: var(--momentum-color);
+    text-shadow: 0 0 20px #FF9500;
+    animation: pulseOrange 2s infinite ease-in-out;
+    display: inline-flex;
+    align-items: center;
+}
+
+.digit-group.momentum::before {
+    content: '+';
+    font-size: 0.5em;
+    vertical-align: middle;
+    margin-right: 20px;
+    opacity: 0.8;
+}
+
+@keyframes pulseOrange {
+    0% { transform: scale(1); text-shadow: 0 0 20px rgba(255, 149, 0, 0.3); }
+    50% { transform: scale(1.02); text-shadow: 0 0 40px rgba(255, 149, 0, 0.6); }
+    100% { transform: scale(1); text-shadow: 0 0 20px rgba(255, 149, 0, 0.3); }
+}
+
+/* TOAST (Apple-Style Popup) */
+.toast {
+    position: fixed;
+    bottom: 180px;
+    left: 50%;
+    
+    /* Visible State */
+    transform: translateX(-50%) translateY(0) scale(1);
+    opacity: 1;
+    
+    background: rgba(20, 20, 20, 0.90);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 12px 24px;
+    border-radius: 50px;
+    color: #FFF;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    pointer-events: none;
+    z-index: 200;
+    width: max-content;
+    max-width: 90vw;
+    text-align: center;
+    
+    /* Same Physics Curve */
+    transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* Hidden State (Shrink & Slide Down) */
+.toast.hidden {
+    display: block !important; /* Keep in layout */
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px) scale(0.95);
+}
+/* Update Toast Special Styling */
+.toast-update {
+    cursor: pointer;
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+/* =========================================
+   v8.5.1 REFLECTION MODAL COMPONENTS
+   ========================================= */
+
+/* 1. The Modal Layout */
+.reflection-modal {
+    padding-top: 40px; /* More space for the checkmark */
+    padding-bottom: 35px;
+}
+
+.modal-text {
+    color: #888;
+    font-size: 14px;
+    margin-bottom: 30px;
+    font-family: var(--font-ui);
+    line-height: 1.5;
+}
+
+/* 2. The Reflection Grid (3 Pills) */
+.reflection-grid {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.reflection-pill {
+    background: #1A1A1A;
+    border: 1px solid #333;
+    color: #FFF;
+    padding: 12px 16px;
+    border-radius: 50px; /* Fully rounded */
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.pill-icon { font-size: 14px; }
+
+/* Interaction States */
+.reflection-pill:hover {
+    background: #222;
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
+}
+.reflection-pill:active {
+    transform: scale(0.95);
+}
+
+/* 3. The Animated Checkmark (Success State) */
+.checkmark-wrapper {
+    width: 60px; height: 60px;
+    margin: 0 auto 25px auto;
+}
+
+.checkmark {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    display: block;
+    stroke-width: 2;
+    stroke: var(--accent-color);
+    stroke-miterlimit: 10;
+    box-shadow: inset 0 0 0 var(--accent-color);
+    /* The animation triggers when the modal opens */
+    animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+}
+
+.checkmark-circle {
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    stroke-width: 2;
+    stroke-miterlimit: 10;
+    stroke: var(--accent-color);
+    fill: none;
+    animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.checkmark-check {
+    transform-origin: 50% 50%;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+}
+
+/* Keyframes for the Checkmark */
+@keyframes stroke { 100% { stroke-dashoffset: 0; } }
+@keyframes scale { 0%, 100% { transform: none; } 50% { transform: scale3d(1.1, 1.1, 1); } }
+@keyframes fill { 
+    100% { box-shadow: inset 0 0 0 30px transparent; } 
+}
+
+/* =========================================
+   v8.5.2 REFINED MODAL ACTIONS
+   ========================================= */
+
+/* The Container for the Discard Button */
+#momentumActions {
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    /* Ensure it works even if hidden was removed */
+    opacity: 1; 
+    transition: opacity 0.3s;
+}
+
+#momentumActions.hidden {
+    display: none !important;
+}
+
+/* The Ghost Button (Discard) */
+.btn-ghost {
+    background: transparent;
+    border: none;
+    color: #666; /* Visible Grey */
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-family: var(--font-mono); /* Use Mono font for numbers */
+    font-size: 11px; /* Slightly smaller to fit longer text */
+    letter-spacing: 0px;
+    opacity: 0.7;
+}
+
+/* Hover State - Red warning */
+.btn-ghost:hover {
+    color: #FF5252;
+    background: rgba(255, 82, 82, 0.1);
+    opacity: 1;
+}
+
+.text-momentum {
+    color: var(--momentum-color, #A855F7); /* Fallback to hex if var missing */
+    font-weight: 700;
+    margin-left: 6px;
+    font-family: var(--font-mono); /* Ensures numbers line up nicely */
+    letter-spacing: -0.5px;
+}
+
+/* =========================================
+   SETTINGS MODAL COMPONENTS
+   ========================================= */
+
+/* Settings Modal Adjustments */
+.settings-modal-box {
+    position: relative;
+    padding-top: 40px;
+}
+
+#btnCloseSettings {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: color 0.2s ease;
+}
+
+.btn-close-top:hover {
+    color: #FFF; /* Nice hover effect for PC users */
+}
+/* The Row Container */
+.setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid #222; /* Subtle divider */
+}
+.setting-row:last-of-type { border-bottom: none; } /* Remove line from last item */
+/* =========================================
+   SETTINGS GROUPING (Auto Flow & Break)
+   ========================================= */
+#autoFlowRow {
+    border-bottom: none;
+    padding-bottom: 8px;
+}
+
+#breakRow {
+    padding-top: 8px;
+}
+
+/* Text Labels */
+.setting-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+}
+.setting-title {
+    color: var(--text-main);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* =========================================
+   SEGMENTED CONTROL (Theme Selector)
+   ========================================= */
+.segmented-control {
+    background: #1A1A1A; /* Dark track */
+    border-radius: 8px;
+    padding: 3px;
+    display: flex;
+    gap: 2px;
+}
+
+.seg-btn {
+    background: transparent;
+    border: none;
+    color: #666;
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: var(--font-ui);
+    font-weight: 500;
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.seg-btn.active {
+    background: #333; /* Pops out slightly */
+    color: #FFF;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+
+/* =========================================
+   TOGGLE SWITCH (iOS Style)
+   ========================================= */
+.toggle-switch {
+    width: 44px;
+    height: 24px;
+    background: #222; /* Off state */
+    border-radius: 12px;
+    border: none;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.toggle-knob {
+    width: 20px;
+    height: 20px;
+    background: #888; /* Off knob */
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Active (ON) State */
+.toggle-switch.active {
+    background: var(--accent-color); /* Uses your brand green! */
+}
+.toggle-switch.active .toggle-knob {
+    background: #000; /* Black knob on colored track looks premium */
+    transform: translateX(20px);
+}
+
+/* =========================================
+   BREAK MODE (v10.0 AUTOFLOW) FIX
+   ========================================= */
+body.mode-break #clockGroup span {
+    color: var(--break-color, #5EEAD4) !important;
+    text-shadow: 0 0 20px rgba(94, 234, 212, 0.4) !important;
+}
+
+body.mode-break .ring-green {
+    stroke: var(--break-color, #5EEAD4) !important;
+}
+
+/* NEW: Keep the text quiet and light grey */
+body.mode-break .task-intent {
+    color: #888 !important; 
+    text-shadow: none !important;
+    opacity: 0.8 !important;
+}
+
+/* Do not grayscale the break color during deep focus */
+body.mode-break.is-deep-focus .controls-section .progress-container {
+    filter: grayscale(0%) !important;
+}
+
+/* =========================================
+   INSIGHTS TAB (v12.0)
+   ========================================= */
+.segmented-wrapper { 
+    display: flex; justify-content: center; margin-bottom: 25px; 
+}
+
+/* Sub-Navigation Typography */
+.insights-subnav {
+    display: flex; justify-content: center; align-items: center; gap: 10px;
+    margin-bottom: 30px; font-family: var(--font-ui); font-size: 13px; font-weight: 500;
+}
+.subnav-item { color: #555; cursor: pointer; transition: color 0.2s; }
+.subnav-item.active { color: #FFF; }
+.subnav-sep { color: #333; }
+
+/* Hero Metrics */
+.insights-hero { text-align: center; margin-bottom: 20px; }
+.hero-time { font-family: var(--font-ui); font-weight: 500; font-size: 36px; color: #FFF; margin-bottom: 8px; }
+.hero-delta { font-family: var(--font-ui); font-size: 13px; color: var(--accent-color); }
+.hero-delta.negative { color: #666; } /* Dim/grey for negative as per your design */
+
+/* .insights-summary {
+    text-align: center; font-family: var(--font-ui); font-size: 13px; color: #888;
+    margin-bottom: 35px; line-height: 1.6;
+} */
+
+/* ==========================================
+   PREMIUM INSIGHT CARDS
+   ========================================== */
+.insights-summary-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.insight-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: relative;
+    transition: background 0.2s ease;
+}
+
+.insight-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.card-data {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    text-align: left;
+}
+
+.card-label {
+    font-size: 10px;
+    color: #888;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: var(--font-ui);
+    font-weight: 600;
+}
+
+.card-value {
+    font-size: 13px;
+    color: #FFF;
+    font-weight: 500;
+}
+
+/* Goal Progress Bar */
+.card-progress-bg {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    margin-top: 4px;
+    overflow: hidden;
+}
+
+.card-progress-fill {
+    height: 100%;
+    background: var(--accent-color, #4CAF50);
+    border-radius: 2px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Quality Badge */
+.card-badge {
+    background: rgba(76, 175, 80, 0.15);
+    color: #4CAF50;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    white-space: nowrap;
+}
+
+/* Sections */
+.insight-section {
+    border-bottom: 1px solid #1A1A1A; padding-bottom: 20px; margin-bottom: 20px;
+}
+.insight-title {
+    font-family: var(--font-ui); 
+    font-size: 11px; 
+    font-weight: 600; 
+    color: #888; 
+    letter-spacing: 1.5px; 
+    text-transform: uppercase; 
+    margin-bottom: 15px;
+}
+
+/* Premium Linear Progress Bars */
+.insight-row {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    font-family: var(--font-ui); font-size: 13px; color: #999; margin-bottom: 8px;
+}
+.row-label { font-weight: 500; color: #FFF; }
+.insight-bar-bg {
+    width: 100%; height: 6px; background: #151515; border-radius: 3px; overflow: hidden; margin-bottom: 16px;
+}
+.insight-bar-fill {
+    height: 100%; background: #444; border-radius: 3px;
+    transition: width 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+}
+.insight-bar-fill.accent { background: var(--accent-color); }
+
+.insight-highlight {
+    font-family: var(--font-ui); font-size: 13px; color: #888; margin-top: 15px;
+}
+
+/* Bulletproof Journal List */
+.journal-item {
+    display: flex; align-items: center; font-family: var(--font-ui);
+    font-size: 13px; margin-bottom: 14px; color: #CCC; line-height: 1.4;
+}
+.journal-item:last-child { margin-bottom: 0; }
+.journal-meta {
+    font-family: var(--font-mono); font-size: 11px; color: #666;
+    min-width: 95px; flex-shrink: 0;
+}
+.journal-task {
+    flex: 1 1 auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-left: 10px;
+}
+/* =========================================
+   DESKTOP OPTIMIZATIONS (v12.0)
+   ========================================= */
+@media (min-width: 768px) {
+    .modal {
+        /* Makes the modal a perfectly sized floating widget on PC */
+        max-height: 650px; 
+    }
+}
+
+/* =========================================
+   SYNC TAB STYLING (v12.2)
+   ========================================= */
+.sync-row {
+    display: flex; gap: 10px; align-items: center; justify-content: space-between;
+}
+.sync-dropdown {
+    background: #151515; border: 1px solid #333; color: #CCC;
+    font-family: var(--font-ui); font-size: 13px; font-weight: 500;
+    padding: 12px 15px; border-radius: 12px; cursor: pointer;
+    flex: 1; outline: none; appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat; background-position: right 15px center; background-size: 14px;
+}
+.sync-dropdown:focus { border-color: #555; }
+
+.btn-sync {
+    background: #151515; border: 1px solid #333; color: #CCC;
+    font-family: var(--font-ui); font-size: 13px; font-weight: 500;
+    padding: 14px 20px; border-radius: 12px; cursor: pointer;
+    transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; box-sizing: border-box;
+}
+.btn-sync:hover { background: #222; color: #FFF; border-color: #555; }
+.sync-icon { font-size: 15px; color: var(--accent-color); opacity: 0.9; }

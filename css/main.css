@@ -1,0 +1,528 @@
+/* =========================================
+   GLOBAL RESET & BODY
+   ========================================= */
+:root {
+    /* ... other variables ... */
+    --momentum-color: #A855F7; /* Electric Violet */
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: var(--font-mono);
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+    transition: background-color 0.8s ease, color 0.8s ease;
+}
+
+.app-shell {
+    width: 100%;
+    max-width: var(--app-max-width);
+    height: 100dvh; /* Dynamic viewport height for mobile */
+    display: flex;
+    flex-direction: column;
+    padding: env(safe-area-inset-top, 0px) 20px env(safe-area-inset-bottom, 0px) 20px;
+    position: relative;
+}
+
+/* =========================================
+   1. HEADER (NAV)
+   ========================================= */
+
+.header {
+    height: var(--header-height);
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.mode-toggle {
+    position: relative;
+    width: 280px;
+    height: 44px;
+    border: 1px solid #333;
+    border-radius: 22px;
+    display: flex;
+    padding: 2px;
+}
+
+.toggle-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    color: #666;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    z-index: 2;
+    transition: color 0.3s ease;
+}
+
+.toggle-btn.active {
+    color: #FFF;
+}
+
+/* Sliding Indicator (The Wheel) */
+.toggle-track {
+    position: absolute;
+    bottom: 0px; 
+    left: 0;
+    width: 50%;
+    height: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    pointer-events: none;
+}
+
+.toggle-track::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--accent-color);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--accent-color);
+    background-image: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, transparent 60%);
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.toggle-track[style*="100%"]::after {
+    transform: rotate(360deg);
+}
+
+
+/* =========================================
+   2. MAIN VIEWPORT
+   ========================================= */
+
+.viewport {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    min-height: 0;
+    justify-content: flex-start;
+    padding-top: 8vh;
+}
+
+/* Clock Display */
+.clock-section {
+    flex: 0 0 auto;
+    text-align: center;
+    height: 160px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.digit-group {
+    font-size: var(--font-size-clock-mobile);
+    font-weight: 400;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+/* Desktop Font Scaling */
+@media (min-width: 900px) {
+    .digit-group {
+        font-size: var(--font-size-clock-desktop);
+    }
+}
+
+/* SEPARATOR (COLON) FIX */
+.sep {
+    color: var(--text-dim);
+    font-size: 0.5em;
+    
+    /* FIX: Lifted to 25% to align with the visual center of numbers */
+    vertical-align: 25%; 
+    
+    margin: 0 2px;
+}
+
+
+/* =========================================
+   3. CONTROLS SECTION
+   ========================================= */
+
+.controls-section {
+    flex: 0 0 auto;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    width: 100%;
+    max-width: 320px;
+    height: 100px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.control-slot {
+    display: flex;
+    align-items: center;
+}
+
+.control-slot.left {
+    justify-content: flex-end;
+    padding-right: 25px;
+}
+
+.control-slot.center {
+    justify-content: center;
+    z-index: 10;
+}
+
+.control-slot.right {
+    justify-content: flex-start;
+    padding-left: 25px;
+}
+
+
+/* =========================================
+   4. LAPS LIST
+   ========================================= */
+
+.laps-container {
+    flex: 0 1 auto;
+    width: 100%;
+    max-width: 360px;
+    max-height: 220px;
+    min-height: 0;
+    overflow-y: auto;
+    margin-top: 10px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+}
+
+.laps-container::-webkit-scrollbar {
+    display: none;
+}
+
+
+/* =========================================
+   5. FOOTER (Updated v9.0)
+   ========================================= */
+
+.footer {
+    flex: 0 0 auto;
+    padding-top: 10px;
+    padding-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.brand {
+    display: flex;
+    /* 1. SINGLE LINE LAYOUT */
+    flex-direction: row; 
+    align-items: center;
+    justify-content: center;
+    gap: 10px; /* Space between items */
+}
+
+.logo {
+    /* 2. DIMMER COLOR (Was #FFF) */
+    color: #666; 
+    
+    font-size: 14px; /* Slightly smaller for elegance */
+    letter-spacing: 2.5px;
+    font-family: var(--font-ui);
+    font-weight: 500;
+    
+    /* 3. THE DOT SEPARATOR (Built-in) */
+    display: flex;
+    align-items: center;
+}
+
+/* Add the dot after the logo */
+.logo::after {
+    content: '·'; /* The middle dot */
+    margin-left: 8px;
+    color: #444; /* Even dimmer dot */
+    font-weight: normal;
+}
+
+.handle {
+    font-size: 14px; /* Match the logo size */
+    color: #444;     /* Keep the handle subtle */
+    text-decoration: none;
+    font-family: var(--font-ui);
+    transition: color 0.3s ease;
+}
+
+/* Hover Effect: Only light up when the user specifically cares */
+.handle:hover {
+    color: var(--accent-color);
+}
+
+
+/* =========================================
+   MOBILE RESPONSIVENESS
+   ========================================= */
+
+@media (max-height: 700px) {
+    .header { height: 80px; }
+    .viewport { padding-top: 4vh; }
+    .clock-section { margin-bottom: 20px; }
+    .digit-group { font-size: 14vw; }
+}
+
+/* =========================================
+   DEEP WORK AUTO-THEME (v7.1)
+   ========================================= */
+
+/* 1. Base Transition Configuration */
+.header, .footer {
+    transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1), 
+                opacity 0.5s ease;
+    will-change: transform, opacity;
+}
+
+/* =========================================
+   DAILY STATS (Streak Rotator)
+   ========================================= */
+#dailyStats {
+    /* --- 1. EXISTING VISUALS (Kept Intact) --- */
+    margin-top: 15px;
+    font-size: 12px;
+    color: #444;
+    font-family: var(--font-ui);
+    letter-spacing: .5px;
+    text-transform: none !important;
+    cursor: pointer;
+
+    /* --- 2. ROTATION ENGINE (New) --- */
+    display: inline-block; /* Critical for transform animations */
+    min-height: 1.5em;     /* Prevents layout jumping when text changes */
+    
+    /* Animation Start State */
+    transform: translateY(0);
+    opacity: 1;
+
+    /* --- 3. TRANSITIONS --- */
+    /* Allows the JS to fade/slide the text smoothly */
+    transition: opacity 0.5s ease, 
+                transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+                color 0.2s !important; /* !important ensures hover color works */
+
+    will-change: opacity, transform;
+}
+/* =========================================
+   DESKTOP SPACING FIX
+   ========================================= */
+
+@media (min-width: 768px) {
+    #dailyStats {
+        /* Push the play button down significantly on big screens */
+        margin-bottom: 45px; 
+        
+        /* Optional: Make the text slightly larger on desktop for balance */
+        transform: scale(1.1); 
+    }
+}
+
+/* 2. Active Focus State (Triggered when Timer is Running) */
+
+body.is-deep-focus .header {
+    transform: translateY(-40px);
+    opacity: 0;
+    pointer-events: none;
+}
+
+body.is-deep-focus .footer {
+    transform: translateY(40px);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* FORCE HIDE during Deep Focus (Overrides the JS Rotator) */
+body.is-deep-focus #dailyStats {
+    opacity: 0 !important;             /* Force invisible */
+    transform: translateY(20px) !important; /* Force slide down */
+    pointer-events: none;              /* No clicking while hidden */
+    filter: blur(1px);                 /* Optional: adds a nice blur effect */
+}
+
+
+/* =========================================
+   v8.5 SMART DIMMER (Mobile Fixed)
+   ========================================= */
+
+.controls-section {
+    transition: opacity 0.5s ease, filter 0.5s ease;
+    will-change: opacity;
+}
+
+/* 1. Deep Focus: Ghost Mode (Default State) */
+body.is-deep-focus .controls-section {
+    opacity: 0.3; /* Visible but dimmed */
+    /* filter: grayscale(100%); */
+    /* Wait 3s, then fade out */
+    transition: opacity 2s ease 3s; 
+}
+/* Making the play/pause button greyscale */
+body.is-deep-focus .controls-section .progress-container {
+    filter: grayscale(100%);
+}
+body .controls-section .progress-container .progress-ring.session-complete-pulse {
+    filter: none !important;
+}
+
+
+/* 2. Wake Up: MOUSE ONLY (The Fix) */
+/* We wrap :hover in this query so phones ignore it */
+@media (hover: hover) {
+    body.is-deep-focus .controls-section:hover {
+        opacity: 1;
+        filter: grayscale(0%);
+        transition-delay: 0s;
+        transition-duration: 0.2s;
+    }
+}
+
+/* 3. Wake Up: TOUCH (Instant Interaction) */
+/* When you actually press down, it lights up instantly */
+body.is-deep-focus .controls-section:active {
+    opacity: 1;
+    filter: grayscale(0%);
+    transition: none;
+}
+
+/* =========================================
+   TASK INTENT (v9.0 Refined)
+   ========================================= */
+.task-intent {
+    background: transparent;
+    border: none;
+    outline: none;
+    text-align: center;
+    
+    /* 1. Hierarchy: Dimmer than the clock (#FFF) */
+    color: #888; 
+    
+    /* 2. Style: Premium spacing, no italics */
+    font-family: var(--font-ui);
+    font-size: 16px;
+    letter-spacing: 0.8px; 
+    font-style: normal;
+    font-weight: 500;
+    
+    width: 100%;
+    max-width: 280px;
+    margin-bottom: 25px;
+    padding: 8px 0;
+    
+    /* Smooth transitions for focus and exit animation */
+    transition: color 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* When typing or filled, it brightens to Light Grey (#CCC)
+   This keeps it readable but still secondary to the bright White clock. */
+.task-intent:focus,
+.task-intent:not(:placeholder-shown) {
+    color: #CCC; 
+}
+
+/* Placeholder is very subtle background noise */
+.task-intent::placeholder {
+    color: #333; 
+    opacity: 1;
+    transition: color 0.3s ease;
+}
+
+/* Hide on very small screens if needed */
+@media (max-height: 600px) {
+    .task-intent { margin-bottom: 10px; font-size: 14px; }
+}
+
+/* TASK INTENT ANIMATION (v8.1) */
+.task-intent {
+    /* Ensure these transitions exist */
+    transition: opacity 0.3s ease, transform 0.3s ease, color 0.2s;
+}
+
+/* The "Ghost Exit" Class */
+.task-intent.clearing {
+    opacity: 0;
+    transform: translateY(-10px); /* Floats up slightly */
+    pointer-events: none; /* Prevents typing while fading */
+}
+/* Auto-Hide State (When running + empty) */
+.task-intent.hidden-running {
+    opacity: 0;
+    pointer-events: none; /* Prevent clicking */
+    
+    /* MOVEMENT: Slide UP (-10px) to float away from the clock */
+    transform: translateY(-10px); 
+    
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+
+/* =========================================
+   v8.6 PHANTOM BURST (Balanced)
+   ========================================= */
+.particle-spark {
+    position: fixed;
+    top: 0; left: 0;
+    width: 5px;   /* Slightly larger to be seen */
+    height: 5px;
+    border-radius: 50%;
+    background-color: var(--accent-color, #4ADE80);
+    
+    /* VISIBILITY FIX: */
+    z-index: 9999; /* On TOP of the button */
+    pointer-events: none;
+    box-shadow: 0 0 6px var(--accent-color); /* Soft Glow */
+    will-change: transform, opacity;
+}
+
+/* Optional: A subtle shockwave ring for extra "feel" */
+.shockwave-ring {
+    position: fixed;
+    top: 0; left: 0;
+    border: 2px solid var(--accent-color);
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 9998;
+}
+
+/* =========================================
+   CELEBRATION ANIMATIONS
+   ========================================= */
+
+/* The Flash Effect for the Ring */
+@keyframes pulse-green {
+    0% { filter: drop-shadow(0 0 0px var(--accent-color)); }
+    50% { filter: drop-shadow(0 0 20px var(--accent-color)); }
+    100% { filter: drop-shadow(0 0 0px var(--accent-color)); }
+}
+
+@keyframes pulse-purple {
+    0% { filter: drop-shadow(0 0 0px #9D50FF); }
+    50% { filter: drop-shadow(0 0 25px #9D50FF); }
+    100% { filter: drop-shadow(0 0 0px #9D50FF); }
+}
+
+@keyframes pulse-gold {
+    0% { filter: drop-shadow(0 0 0px #FFD700); }
+    50% { filter: drop-shadow(0 0 30px #FFD700); }
+    100% { filter: drop-shadow(0 0 0px #FFD700); }
+}
+
+/* Classes to trigger the animation */
+.celebrate-100 { animation: pulse-green 1.5s ease-in-out 3; }  /* Pulse 3 times */
+.celebrate-200 { animation: pulse-purple 1.5s ease-in-out 3; }
+.celebrate-300 { animation: pulse-gold 1.5s ease-in-out 6; } /* Gold pulses forever */

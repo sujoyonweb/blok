@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>BLOK | Focus Timer</title>
+
+    <link rel="manifest" href="manifest.json">
+
+    <meta name="theme-color" content="#000000">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="BLOK">
+
+    <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg">
+    <link rel="apple-touch-icon" href="./assets/favicon.svg">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+
+    <div class="app-shell">
+        
+        <header class="header">
+            <div class="mode-toggle">
+                <div class="toggle-track"></div>
+                <button class="toggle-btn active" id="tabTimer">Timer</button>
+                <button class="toggle-btn" id="tabStopwatch">Stopwatch</button>
+            </div>
+        </header>
+
+        <main class="viewport">
+            
+            <div class="clock-section" style="flex-direction: column; justify-content: center;">
+                <input type="text" id="taskInput" class="task-intent" placeholder="What are you working on?" autocomplete="off" spellcheck="false">
+                <div class="digit-group" id="clockGroup">
+                    <span id="displayHr">00</span><span class="sep">:</span><span id="displayMin">25</span><span class="sep">:</span><span id="displaySec">00</span>
+                </div>
+                <div id="dailyStats" style="margin-top: 15px; font-size: 12px; color: #444; font-family: var(--font-ui); letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: color 0.2s;">
+                    Today: 0h 0m
+                </div>
+            </div>
+
+            <div class="controls-section">
+                <div class="control-slot left">
+                    <button id="btnReset" class="btn-circle secondary hidden" aria-label="Reset">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"></circle>
+                            <polyline points="1 4 1 10 7 10"></polyline>
+                            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                        </svg>
+                    </button>
+                    <button id="btnLap" class="btn-circle secondary hidden" aria-label="Lap">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+                    </button>
+                </div>
+
+                <div class="control-slot center">
+                    <div class="progress-container">
+                        <svg class="progress-ring" width="120" height="120" viewBox="0 0 120 120">
+                             <circle class="progress-ring-track" cx="60" cy="60" r="44" stroke="#222" stroke-width="4" fill="transparent" />
+                             <circle class="progress-ring-fill ring-green" cx="60" cy="60" r="44" stroke-linecap="round" fill="transparent" stroke-width="4" />
+                             <circle class="progress-ring-fill ring-purple" cx="60" cy="60" r="44" stroke-linecap="round" fill="transparent" stroke-width="4" />
+                             <circle class="progress-ring-fill ring-gold" cx="60" cy="60" r="44" stroke-linecap="round" fill="transparent" stroke-width="4" />
+                        </svg>
+                        
+                        <button id="btnMain" class="btn-circle primary" aria-label="Start">
+                            <svg class="icon-play" width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                            <svg class="icon-pause hidden" width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="control-slot right">
+                    <button id="btnMomentum" class="btn-circle secondary hidden" aria-label="Momentum Mode">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 12c-2-2.67-4-4-6-4a4 4 0 1 0 0 8c2 0 4-1.33 6-4Zm0 0c2 2.67 4 4 6 4a4 4 0 1 0 0-8c-2 0-4 1.33-6 4Z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div id="lapList" class="laps-container hidden"></div>
+        </main>
+
+        <footer class="footer">
+            <div class="presets-wrapper" id="timerMenuWrapper">
+                <div class="presets-scroll" id="presetContainer"></div>
+            </div>
+            
+            <div class="brand">
+                <span class="logo" id="btnSettings" style="cursor: pointer;">blok</span>
+                <a href="https://instagram.com/sujoyonweb" target="_blank" class="handle">@sujoyonweb</a>
+            </div>
+        </footer>
+    </div>
+
+    <div id="toast" class="toast hidden">Momentum Mode ON</div>
+    <div id="toastAuto" class="toast hidden">Auto Flow ON</div>
+    <div id="toastUpdate" class="toast toast-update hidden">
+        Update Ready! Click to reload ✨
+    </div>
+
+    <div id="customModal" class="modal-backdrop hidden">
+        <div class="modal">
+            <div class="modal-header">SET DURATION</div>
+            <div class="picker-row">
+                <div class="picker-col"><label>HR</label><input type="number" id="inpHr" value="00"></div>
+                <div class="picker-sep">:</div>
+                <div class="picker-col"><label>MIN</label><input type="number" id="inpMin" value="25"></div>
+                <div class="picker-sep">:</div>
+                <div class="picker-col"><label>SEC</label><input type="number" id="inpSec" value="00"></div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal cancel" id="btnCancelModal">Cancel</button>
+                <button class="btn-modal start" id="btnStartModal">Start</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="completeModal" class="modal-backdrop hidden">
+        <div class="modal reflection-modal">
+            <button id="btnModalClose" class="modal-close-icon">&times;</button>
+            
+            <div class="checkmark-wrapper">
+                 <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                     <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                     <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                 </svg>
+            </div>
+            
+            <div class="modal-header">SESSION COMPLETE</div>
+            
+            <p id="completeText" class="modal-text">How was your focus?</p>
+            
+            <div id="reflectionGrid" class="reflection-grid">
+                <button class="reflection-pill" onclick="UI.handleReflection('deep')">
+                    <span class="pill-icon">🔥</span> Deep
+                </button>
+                <button class="reflection-pill" onclick="UI.handleReflection('balanced')">
+                    <span class="pill-icon">⚖️</span> Balanced
+                </button>
+                <button class="reflection-pill" onclick="UI.handleReflection('distracted')">
+                    <span class="pill-icon">🌀</span> Distracted
+                </button>
+            </div>
+
+            <div id="momentumActions" class="hidden">
+                <button class="btn-ghost" id="btnDiscardMomentum">Discard Extra Time</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="statsModal" class="modal-backdrop hidden">
+        <div class="modal">
+            
+            <div class="segmented-wrapper">
+                <div class="segmented-control" id="statsTabSelector">
+                    <button class="seg-btn active" data-tab="overview">Overview</button>
+                    <button class="seg-btn" data-tab="insights">Insights</button>
+                    <button class="seg-btn" data-tab="sync">Sync</button>
+                </div>
+            </div>
+
+            <div id="tabOverview">
+                <div id="statsHeader" class="modal-header">LAST 7 DAYS</div>
+                <div id="chartBars" class="chart-wrapper"></div>
+                
+                <div class="goal-wrapper">
+                    <span class="goal-label">DAILY GOAL (HOURS)</span>
+                    <div class="goal-input-row">
+                        <button id="btnGoalDec" class="btn-goal">-</button>
+                        <span id="goalValue">6</span>
+                        <button id="btnGoalInc" class="btn-goal">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tabInsights" class="hidden" style="text-align: left;">
+                
+                <div class="insights-subnav">
+                    <span class="subnav-item active" id="btnRangeToday">Today</span>
+                    <span class="subnav-sep">•</span>
+                    <span class="subnav-item" id="btnRangeWeek">This Week</span>
+                </div>
+
+                <div class="insights-hero">
+                    <div class="hero-time" id="insightTotalTime">0h 00m</div>
+                    <div class="hero-delta" id="insightDelta">▲ +0m vs yesterday</div>
+                </div>
+
+                <div class="insights-summary-cards" style="margin-bottom: 25px;">
+                    
+                    <div class="insight-card">
+                        <div class="card-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <circle cx="12" cy="12" r="6"></circle>
+                                <circle cx="12" cy="12" r="2"></circle>
+                            </svg>
+                        </div>
+                        <div class="card-data">
+                            <div class="card-label">GOAL</div>
+                            <div class="card-value" id="insightGoalText">0h target • 0% Completed</div>
+                            <div class="card-progress-bg"><div class="card-progress-fill" id="insightGoalBar" style="width: 0%;"></div></div>
+                        </div>
+                    </div>
+
+                    <div class="insight-card">
+                        <div class="card-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4CAF50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                        </div>
+                        <div class="card-data">
+                            <div class="card-label">FOCUS QUALITY</div>
+                            <div class="card-value" id="insightQualityText">Pending</div>
+                        </div>
+                        <div class="card-badge hidden" id="insightQualityBadge">--</div>
+                    </div>
+
+                </div> 
+
+                <div class="insight-section">
+                    <div class="insight-title">EFFICIENCY</div>
+                    <div id="insightEfficiencyBars"></div>
+                </div>
+
+                <div class="insight-section">
+                    <div class="insight-title">FOCUS DISTRIBUTION</div>
+                    <div id="insightMacroBars"></div>
+                </div>
+
+                <div class="insight-section">
+                    <div class="insight-title">SUBJECT BREAKDOWN</div>
+                    <div id="insightMicroBars"></div>
+                    <div class="insight-highlight" id="insightHighlight">Most time spent: —</div>
+                </div>
+
+                <div class="insight-section" style="border-bottom: none; padding-bottom: 0;">
+                    <div class="insight-title">RECENT SESSIONS</div>
+                    <div id="insightJournalList"></div>
+                </div>
+            </div>
+
+            <div id="tabSync" class="hidden" style="text-align: left;">
+                
+                <div class="insights-summary" style="margin-bottom: 25px; text-align: center;">
+                    Keep your data unified across devices.<br>Your settings are kept separate.
+                </div>
+
+                <div class="insight-section">
+                    <div class="insight-title">DEVICE SYNC (JSON)</div>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <button class="btn-sync" id="btnExportSync">
+                            <svg class="sync-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            Export Backup Data
+                        </button>
+                        
+                        <label class="btn-sync" for="importSyncFile">
+                            <svg class="sync-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Merge Data from File
+                            <input type="file" id="importSyncFile" accept=".json" style="display: none;">
+                        </label>
+                    </div>
+                </div>
+
+                <div class="insight-section" style="border-bottom: none; padding-bottom: 0;">
+                    <div class="insight-title">SPREADSHEET EXPORT</div>
+                    <div class="sync-row">
+                        <select id="exportDuration" class="sync-dropdown">
+                            <option value="7">Last 7 Days</option>
+                            <option value="30">Last 30 Days</option>
+                            <option value="all" selected>All Time</option>
+                        </select>
+                        <button class="btn-sync" id="btnExportCSV">
+                            <span class="sync-icon">📊</span> Download .CSV
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-actions" style="margin-top: 25px;">
+                <button class="btn-modal cancel" id="btnCloseStats">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="settingsModal" class="modal-backdrop hidden">
+        <div class="modal settings-modal-box">
+            
+            <button id="btnCloseSettings" class="btn-close-top" aria-label="Close Settings">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <div class="modal-header">PREFERENCES</div>
+            
+            <div class="setting-row" id="autoFlowRow">
+                <div class="setting-info">
+                    <span class="setting-title">Auto Flow</span>
+                </div>
+                <button id="toggleAutoFlow" class="toggle-switch">
+                    <div class="toggle-knob"></div>
+                </button>
+            </div>
+
+            <div class="setting-row" id="breakRow" style="opacity: 0.5; pointer-events: none; transition: opacity 0.3s;">
+                <div class="setting-info">
+                    <span class="setting-title">Break Duration</span>
+                </div>
+                <div class="segmented-control" id="breakSelector">
+                    <button class="seg-btn active" data-val="5">5m</button>
+                    <button class="seg-btn" data-val="10">10m</button>
+                    <button class="seg-btn" data-val="15">15m</button>
+                </div>
+            </div>
+
+            <div class="setting-row" style="margin-top: 5px;">
+                <div class="setting-info">
+                    <span class="setting-title">Theme</span>
+                </div>
+                <div class="segmented-control" id="themeSelector">
+                    <button class="seg-btn active" data-val="auto">Auto</button>
+                    <button class="seg-btn" data-val="day">Day</button>
+                    <button class="seg-btn" data-val="night">Night</button>
+                </div>
+            </div>
+
+            <div class="setting-row" style="margin-top: 5px;">
+                <div class="setting-info">
+                    <span class="setting-title">BGM</span>
+                </div>
+                <div class="segmented-control" id="bgmSelector">
+                    <button class="seg-btn active" data-val="none">Off</button>
+                    <button class="seg-btn" data-val="brown">Brown</button>
+                    <button class="seg-btn" data-val="alpha">Alpha</button>
+                    <button class="seg-btn" data-val="rain">Rain</button>
+                </div>
+            </div>
+
+            <div class="setting-row">
+                <div class="setting-info">
+                    <span class="setting-title">Sound Effects</span>
+                </div>
+                <button id="toggleSound" class="toggle-switch active">
+                    <div class="toggle-knob"></div>
+                </button>
+            </div>
+
+            <div class="setting-row">
+                <div class="setting-info">
+                    <span class="setting-title">Haptic Feedback</span>
+                </div>
+                <button id="toggleHaptics" class="toggle-switch active">
+                    <div class="toggle-knob"></div>
+                </button>
+            </div>
+
+            <div class="setting-row">
+                <div class="setting-info">
+                    <span class="setting-title">Keep Screen Awake</span>
+                </div>
+                <button id="toggleAwake" class="toggle-switch active">
+                    <div class="toggle-knob"></div>
+                </button>
+            </div>
+
+            <div id="installGroup" class="hidden" style="margin-top: 25px;">
+                <button class="btn-sync" id="btnInstallApp" style="border-color: rgba(76, 175, 80, 0.3); color: var(--accent-color); background: rgba(76, 175, 80, 0.05);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Install App to Home Screen
+                </button>
+            </div>
+
+            <div style="margin-top: 60px; margin-bottom: 20px;">
+                <button id="btnResetData" class="btn-ghost" style="color: #666; font-size: 11px;">Clear All Data</button>
+            </div>
+
+            <!-- <div class="modal-actions">
+                <button class="btn-modal cancel" id="btnCloseSettings">Done</button>
+            </div> -->
+        </div>
+    </div>
+
+    <div id="confirmModal" class="modal-backdrop hidden">
+        <div class="modal">
+            <div class="modal-header" style="color: #FF453A;">WARNING</div>
+            
+            <p class="modal-text" style="margin-bottom: 25px;">
+                Are you sure you want to delete all focus stats and history?<br><br>
+                <strong style="color: #FFF;">This cannot be undone.</strong>
+            </p>
+            
+            <div class="modal-actions">
+                <button class="btn-modal cancel" id="btnCancelReset">Cancel</button>
+                <button class="btn-modal start" id="btnConfirmReset" style="background: #FF453A; color: #FFF;">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- <audio id="bgmRain" src="assets/rain.mp3" loop></audio> -->
+
+    <script src="js/config.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/sound.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/journal.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/timer.js"></script>
+    <script src="js/stopwatch.js"></script>
+    <script src="js/app.js"></script>
+
+</body>
+</body>
+</html>

@@ -1,0 +1,19 @@
+/* Hard Reset */
+* { 
+    box-sizing: border-box; 
+    margin: 0; padding: 0; 
+    user-select: none; 
+    -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; 
+    width: 100%; 
+}
+button { 
+    outline: none; 
+    -webkit-touch-callout: none; 
+}
+html, body { 
+    height: 100%; 
+    width: 100%; 
+    overscroll-behavior: none; /* 🛑 THE FIX: Prevents Android pull-to-refresh */
+    -webkit-touch-callout: none; /* Prevents long-press popups */
+}
