@@ -47,33 +47,53 @@ const App = {
 
     setupPWAInstall() {
         // ==========================================
-        // 📲 CUSTOM PWA INSTALL ENGINE
+        // 📲 CUSTOM PWA INSTALL ENGINE (With iOS Support)
         // ==========================================
+        const installGroup = document.getElementById('installGroup');
+        const btnInstallApp = document.getElementById('btnInstallApp');
+        
+        // 1. Detect if the user is on an iPhone/iPad
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        // Detect if the app is already installed and running standalone
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+        // --- APPLE DEVICE LOGIC ---
+        if (isIOS && !isStandalone) {
+            if (installGroup) installGroup.classList.remove('hidden');
+            if (btnInstallApp) {
+                // Change the button text for Apple users
+                btnInstallApp.innerHTML = `
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                        <polyline points="16 6 12 2 8 6"></polyline>
+                        <line x1="12" y1="2" x2="12" y2="15"></line>
+                    </svg>
+                    How to Install on iOS
+                `;
+                btnInstallApp.addEventListener('click', () => {
+                    Sound.play('click');
+                    UI.showToast("Tap the Safari 'Share' icon below, then 'Add to Home Screen'");
+                });
+            }
+            return; // Stop here for iOS
+        }
+
+        // --- ANDROID / CHROME LOGIC ---
         let deferredPrompt;
         
         window.addEventListener('beforeinstallprompt', (e) => {
-            // Prevent the mini-infobar from appearing on mobile
             e.preventDefault();
-            // Stash the event so it can be triggered later.
             deferredPrompt = e;
-            
-            // Unhide our custom install button in the settings menu
-            const installGroup = document.getElementById('installGroup');
             if (installGroup) installGroup.classList.remove('hidden');
         });
 
-        const btnInstallApp = document.getElementById('btnInstallApp');
         if (btnInstallApp) {
             btnInstallApp.addEventListener('click', async () => {
                 if (deferredPrompt) {
-                    // Show the native install prompt
+                    Sound.play('click');
                     deferredPrompt.prompt();
-                    // Wait for the user to respond to the prompt
                     const { outcome } = await deferredPrompt.userChoice;
                     if (outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
-                        // Hide the button once installed
-                        const installGroup = document.getElementById('installGroup');
                         if (installGroup) installGroup.classList.add('hidden');
                     }
                     deferredPrompt = null;
@@ -81,9 +101,8 @@ const App = {
             });
         }
         
-        // Hide the button completely if the app is already installed
+        // Hide the button completely if they install it successfully
         window.addEventListener('appinstalled', () => {
-            const installGroup = document.getElementById('installGroup');
             if (installGroup) installGroup.classList.add('hidden');
         });
     },
