@@ -394,6 +394,25 @@ const App = {
             };
         }
 
+        if (UI.els.toggleNotifications) {
+            UI.els.toggleNotifications.onclick = async () => {
+                const current = Storage.get(Storage.KEYS.NOTIFICATIONS_ON, false);
+                const isTurningOn = !current;
+                
+                if (isTurningOn) {
+                    const granted = await Notify.requestPermission();
+                    if (!granted) {
+                        UI.showToast("Notification permission denied");
+                        return; // Stop here, don't flip the switch
+                    }
+                }
+                
+                Storage.set(Storage.KEYS.NOTIFICATIONS_ON, isTurningOn);
+                UI.updateSettingsUI();
+                Sound.play('click');
+            };
+        }
+
         if (UI.els.toggleHaptics) {
             UI.els.toggleHaptics.onclick = () => {
                 const current = Storage.get(Storage.KEYS.HAPTICS_ON, true);

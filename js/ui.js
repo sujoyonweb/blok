@@ -43,6 +43,7 @@ const UI = {
         btnSettings: document.getElementById('btnSettings'),
         btnCloseSettings: document.getElementById('btnCloseSettings'),
         themeBtns: document.querySelectorAll('#themeSelector .seg-btn'),
+        toggleNotifications: document.getElementById('toggleNotifications'),
         toggleSound: document.getElementById('toggleSound'),
         toggleHaptics: document.getElementById('toggleHaptics'),
         toggleAwake: document.getElementById('toggleAwake'),
@@ -337,7 +338,16 @@ const UI = {
     },
 
     switchLayout(mode) {
+        const viewport = document.querySelector('.viewport');
         const isTimer = mode === 'timer';
+
+        // --- NEW: Spatial Slide Animation ---
+        viewport.classList.remove('slide-from-left', 'slide-from-right');
+        void viewport.offsetWidth; // Magic trick: Forces the browser to reset the animation
+        
+        // Slide in from the direction of the tab being clicked
+        viewport.classList.add(isTimer ? 'slide-from-left' : 'slide-from-right');
+        // --------------------------------------
         
         // 1. Move the Header Toggle Indicator
         this.els.track.style.transform = isTimer ? 'translateX(0)' : 'translateX(100%)';
@@ -348,9 +358,16 @@ const UI = {
         document.body.classList.remove('mode-timer', 'mode-stopwatch');
         document.body.classList.add(isTimer ? 'mode-timer' : 'mode-stopwatch');
         
-        // 3. Show/Hide Presets and Laps
-        if(this.els.menu.wrapper) this.els.menu.wrapper.classList.toggle('hidden', !isTimer);
-        if(this.els.laps) this.els.laps.classList.toggle('hidden', isTimer);
+        // 3. Clean Layout Swap (Let the horizontal Spatial Slide handle the movement)
+        if (this.els.menu.wrapper) {
+            this.els.menu.wrapper.classList.remove('slide-away'); // Clear any stuck animations
+            this.els.menu.wrapper.classList.toggle('hidden', !isTimer);
+        }
+        
+        if (this.els.laps) {
+            this.els.laps.classList.remove('slide-away'); // Clear any stuck animations
+            this.els.laps.classList.toggle('hidden', isTimer);
+        }
         
         // 4. Manage Controls (Momentum vs Lap)
         if (isTimer) {
@@ -691,6 +708,10 @@ const UI = {
         // <-- NEW AWAKE TOGGLE LOGIC -->
         const awakeOn = Storage.get(Storage.KEYS.AWAKE_ON, true);
         if (this.els.toggleAwake) this.els.toggleAwake.classList.toggle('active', awakeOn);
+
+        // <-- NEW NOTIFICATION LOGIC -->
+        const notifOn = Storage.get(Storage.KEYS.NOTIFICATIONS_ON, false);
+        if (this.els.toggleNotifications) this.els.toggleNotifications.classList.toggle('active', notifOn);
         
         const autoFlowOn = Storage.get(Storage.KEYS.AUTOFLOW_ENABLED, false);
         if (this.els.toggleAutoFlow) this.els.toggleAutoFlow.classList.toggle('active', autoFlowOn);

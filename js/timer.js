@@ -384,6 +384,7 @@ const Timer = {
             Storage.set('blok_session_id', this.sessionId);
             
             Sound.play('alarm');
+            Notify.send("Target Reached! 🔥", "You are now in Momentum mode.");
         }
 
         // Calculate the anchor time (this math applies perfectly whether we are 
@@ -653,6 +654,9 @@ const Timer = {
             this.saveSessionTrackers();
 
             Sound.play('alarm'); 
+            let notifTitle = this.sessionPhase === 'focus' ? "Session Complete! ⏳" : "Break Over! 🚀";
+            let notifBody = this.sessionPhase === 'focus' ? "Starting your break automatically." : "Time to get back to work.";
+            Notify.send(notifTitle, notifBody);
             if (typeof UI !== 'undefined') UI.setSuccessState(true); 
 
             // --- THE "DEEP BREATH" (NO-SCALE PERFECT MASKING) ---
@@ -771,6 +775,9 @@ const Timer = {
             const isBreak = this.currentLabel.toLowerCase().includes('break');
             
             Sound.play('alarm'); 
+            let stdTitle = isBreak ? "Break Over! 🚀" : "Session Complete! ⏳";
+            let stdBody = isBreak ? "Time to get back to work." : "Great focus. Time to take a break.";
+            Notify.send(stdTitle, stdBody);
             if (typeof UI !== 'undefined') UI.setSuccessState(true); 
 
             if (!isBreak && this.duration >= GRACE_PERIOD_SEC) { 

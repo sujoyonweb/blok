@@ -32,6 +32,7 @@ const Storage = {
         HAPTICS_ON: 'blok_haptics_on',
         AWAKE_ON: 'blok_awake_on',
         BGM_TRACK: 'blok_bgm_track',
+        NOTIFICATIONS_ON: 'blok_notif_on',
 
         // v10.0 AUTOFLOW TRACKERS
         AUTOFLOW_ENABLED: 'blok_autoflow_enabled',
