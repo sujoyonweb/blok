@@ -494,12 +494,28 @@ const App = {
         // 🔄 SYNC, EXPORT & SMART MERGE ENGINE (v12.2)
         // ==========================================
 
+        // CLICK LISTENERS: For the new Export Duration segmented control
+        const exportBtns = document.querySelectorAll('#exportDurationSelector .seg-btn');
+        if (exportBtns) {
+            exportBtns.forEach(btn => {
+                btn.onclick = (e) => {
+                    Sound.play('click');
+                    exportBtns.forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                };
+            });
+        }
+
         // 1. CSV SPREADSHEET EXPORT
         const btnCSV = document.getElementById('btnExportCSV');
         if (btnCSV) {
             btnCSV.onclick = () => {
                 Sound.play('click');
-                const duration = document.getElementById('exportDuration').value;
+                
+                // READ VALUE: From the active segmented button instead of a <select>
+                const activeExportBtn = document.querySelector('#exportDurationSelector .seg-btn.active');
+                const duration = activeExportBtn ? activeExportBtn.dataset.val : 'all';
+                
                 const allLogs = typeof Journal !== 'undefined' ? Journal.getAllLogs() : [];
                 
                 const now = Date.now();

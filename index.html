@@ -14,7 +14,7 @@
     <meta name="apple-mobile-web-app-title" content="BLOK">
 
     <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg">
-    <link rel="apple-touch-icon" href="./assets/favicon.svg">
+    <link rel="apple-touch-icon" href="./assets/icon-192.png">
     
     <link rel="preload" href="./assets/fonts/jetbrains-mono-v24-latin-500.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="./assets/fonts/inter-v20-latin-500.woff2" as="font" type="font/woff2" crossorigin>
@@ -283,14 +283,14 @@
                     </div>
                 </div>
 
-                <div class="insight-section" style="border-bottom: none; padding-bottom: 0;">
+                <div class="insight-section" style="border-bottom: none; padding-bottom: 20px;">
                     <div class="insight-title">SPREADSHEET EXPORT</div>
-                    <div class="sync-row">
-                        <select id="exportDuration" class="sync-dropdown">
-                            <option value="7">Last 7 Days</option>
-                            <option value="30">Last 30 Days</option>
-                            <option value="all" selected>All Time</option>
-                        </select>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <div class="segmented-control" id="exportDurationSelector" style="display: flex;">
+                            <button class="seg-btn" data-val="7" style="flex: 1;">7 Days</button>
+                            <button class="seg-btn" data-val="30" style="flex: 1;">30 Days</button>
+                            <button class="seg-btn active" data-val="all" style="flex: 1;">All Time</button>
+                        </div>
                         <button class="btn-sync" id="btnExportCSV">
                             <span class="sync-icon">📊</span> Download .CSV
                         </button>
