@@ -1012,7 +1012,7 @@ const UI = {
         const highlightEl = document.getElementById('insightHighlight');
         if (highlightEl) {
             if (topSubjectArr.length > 0 && topSubjectArr[0][1] > 0) {
-                highlightEl.innerHTML = `Most time spent: <strong style="color:#FFF;">${topSubjectArr[0][0]}</strong>`;
+                highlightEl.innerHTML = `Most time spent: <strong style="color: var(--text-main);">${topSubjectArr[0][0]}</strong>`;
             } else {
                 highlightEl.innerHTML = `Most time spent: —`;
             }
@@ -1022,7 +1022,7 @@ const UI = {
         const journalEl = document.getElementById('insightJournalList');
         if (journalEl) {
             if (focusLogs.length === 0) {
-                journalEl.innerHTML = '<div style="color:#666; font-size:13px; padding-bottom: 20px;">No sessions logged yet.</div>';
+                journalEl.innerHTML = '<div style="color: var(--text-dim); font-size:13px; padding-bottom: 20px;">No sessions logged yet.</div>';
             } else {
                 journalEl.innerHTML = focusLogs.slice(0, 5).map(log => {
                     let displayTask = log.task;
@@ -1045,4 +1045,41 @@ const UI = {
         }
     }
 
-};
+}; // UI Object Ends
+
+
+// ==========================================
+// 🚀 PWA BACKGROUND CATCH-UP ENGINE
+// ==========================================
+// Forces the timer to mathematically update the exact millisecond the user 
+// switches back to the tab, before the browser's setInterval even wakes up.
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && typeof Timer !== 'undefined' && Timer.isRunning) {
+        
+        if (Timer.isMomentum) {
+            const now = Date.now();
+            Timer.momentumSeconds = Math.floor((now - Timer.momentumStartTime) / 1000);
+            Timer.render();
+            
+        } else if (Timer.endTime) {
+            const delta = Timer.endTime - Date.now();
+            
+            if (delta > 0) {
+                Timer.remaining = Math.ceil(delta / 1000);
+                Timer.render();
+            } else {
+                // If time ran out while the app was minimized, instantly trigger completion!
+                clearInterval(Timer.interval);
+                Timer.remaining = 0;
+                
+                if (Timer.isMomentumMode) {
+                    // THE FIX: Recover the exact background momentum seconds so we don't lose them!
+                    const overTime = Math.abs(Math.floor(delta / 1000));
+                    Timer.triggerMomentumTransition(overTime);
+                } else {
+                    Timer.finish();
+                }
+            }
+        }
+    }
+});

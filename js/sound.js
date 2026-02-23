@@ -77,8 +77,8 @@ class SoundEngine {
             osc.frequency.setValueAtTime(600, now);
             osc.frequency.exponentialRampToValueAtTime(100, now + 0.02);
             
-            // THE THUD: Volume hits 6% (perfect for 60% phone volume) and fades out instantly
-            gain.gain.setValueAtTime(0.06, now);
+            // THE THUD: Bumped to 15% to give presence at medium phone volumes
+            gain.gain.setValueAtTime(0.15, now);
             gain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
             
             osc.start(now);

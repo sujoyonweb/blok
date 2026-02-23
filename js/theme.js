@@ -34,7 +34,6 @@ const Theme = {
         // If 'auto', we calculate the actual theme based on the hour
         if (pref === 'auto') {
             const hour = new Date().getHours();
-            // Day mode between 6:00 AM (6) and 5:59 PM (17)
             if (hour >= 6 && hour < 18) {
                 themeToApply = 'day';
             } else {
@@ -43,12 +42,24 @@ const Theme = {
         }
 
         // Apply it to the HTML root element
-        // If themeToApply is 'day', we remove the attribute so it uses the :root defaults
         if (themeToApply === 'day') {
             document.documentElement.removeAttribute('data-theme');
         } else {
-            // This handles 'night', 'ocean', 'sunset', etc. automatically!
             document.documentElement.setAttribute('data-theme', themeToApply);
+        }
+
+        // --- THE DYNAMIC CSS VARIABLE FIX ---
+        // We read the active CSS variable so we never have to hardcode hex colors in JS!
+        const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+        if (metaThemeColor) {
+            // Get the computed styles of the page after the theme was just changed
+            const rootStyles = getComputedStyle(document.documentElement);
+            
+            // Extract the exact value of --bg-color (e.g., "#000000" or "#060504")
+            const activeBgColor = rootStyles.getPropertyValue('--bg-color').trim();
+            
+            // Inject that pure hex color into the meta tag for the mobile status bar
+            metaThemeColor.setAttribute('content', activeBgColor);
         }
     }
 };

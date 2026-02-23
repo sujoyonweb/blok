@@ -36,6 +36,7 @@ body {
 button, .card-label, .insight-title, .preset-pill, .seg-btn, .logo {
     user-select: none;
     -webkit-user-select: none;
+    touch-action: manipulation;
 }
 
 /* 4. Changes the blinking typing cursor in your Task Input to match your new Matte Green */

@@ -49,47 +49,45 @@
 }
 :root {
     /* =========================================
-       🌞 DAY MODE (Neutral, High-Contrast Black)
+       🌞 DAY MODE (Pure Black, Industrial Focus)
        ========================================= */
-    --bg-color: #000000;
-    --surface-color: #1C1C1E;
+    --bg-color: #000000;         /* Pure OLED Black */
+    --surface-color: #0E0E0E;    /* Dark matte for Modals/Cards */
     
-    --text-main: #FFFFFF;
-    --text-dim: #555555;
+    --text-main: #F3F4F6;        /* Paper White (Removes laser-intensity of #FFF) */
+    --text-dim: #666666;         /* Classic UI Grey */
     
     /* Brand Accents */
-    --accent-color: #27AE60;
-    --momentum-color: #A855F7; 
-    --break-color: #5EEAD4; /* Restorative Teal for Break Mode */
+    --accent-color: #27AE60;     /* Sage Green */
+    --momentum-color: #A855F7;   /* Electric Violet */
+    --break-color: #5EEAD4;      /* Restorative Teal */
     
+    /* Elements */
     --btn-bg: #1A1A1A;
-    --btn-hover: #252525;
+    --btn-hover: #222222;
+    --border-color: #333333;     /* Sharp, hard borders */
     
-    /* --- DIMENSIONS --- */
+    /* --- DIMENSIONS & TYPOGRAPHY --- */
     --app-max-width: 900px;
     --header-height: 120px;
     --footer-height: 140px;
-    
-    /* --- TYPOGRAPHY --- */
     --font-mono: 'JetBrains Mono', monospace;
     --font-ui: 'Inter', sans-serif;
-    
     --font-size-clock-desktop: 140px;
     --font-size-clock-mobile: 15vw;
 }
 
 [data-theme="night"] {
     /* =========================================
-       🌙 NIGHT MODE (Warm, Low-Strain Charcoal)
+       🌙 NIGHT MODE (Industrial Graphite / Zinc)
        ========================================= */
-    --bg-color: #060504;      
-    --surface-color: #151412; 
+    --bg-color: #0E0E11;         /* Deep Slate/Graphite (Kills OLED purple-smear) */
+    --surface-color: #18181B;    /* Elevated Zinc for Modals */
     
-    --text-main: #EAE8E3;     
-    --text-dim: #7E7A74;      
+    --text-main: #E4E4E7;        /* Cloud White (Soft, crisp, zero glare) */
+    --text-dim: #A1A1AA;         /* Lighter industrial grey for readability */
     
-    --btn-bg: #151412;
-    --btn-hover: #1E1C1A;
-    
-    /* Accent colors remain the same so the app's identity doesn't break */
+    --btn-bg: #27272A;           /* Zinc buttons */
+    --btn-hover: #3F3F46;
+    --border-color: #3F3F46;     /* Softer, lower-contrast borders */
 }

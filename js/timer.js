@@ -384,8 +384,7 @@ const Timer = {
                     clearInterval(this.interval);
                     this.remaining = 0;
                     if (this.isMomentumMode) {
-                        this.momentumSeconds = 0; 
-                        this.startMomentum(); 
+                        this.triggerMomentumTransition(); 
                     } else {
                         this.finish(); 
                     }
@@ -393,6 +392,109 @@ const Timer = {
             }, 100);
 
         }, 300); 
+    },
+
+    triggerMomentumTransition(backgroundSeconds = 0) {
+        // 1. Lock the timer and force 00:00:00
+        this.isRunning = false; 
+        clearInterval(this.interval);
+        this.remaining = 0;
+        this.render(); 
+
+        // 2. Trigger the Success Glow & Alarm instantly
+        Sound.play('alarm'); 
+        if (typeof UI !== 'undefined') UI.setSuccessState(true); 
+
+        const clock = document.getElementById('clockGroup');
+        const task = document.getElementById('taskInput'); 
+
+        // Phase 1: EXHALE (Drop & Blur)
+        setTimeout(() => {
+            if (clock) {
+                clock.style.transition = 'transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1), filter 0.6s ease, opacity 0.3s ease-out';
+                clock.style.transform = 'translateY(40px)'; 
+                clock.style.filter = 'blur(25px)'; 
+                clock.style.setProperty('opacity', '0', 'important'); 
+            }
+            if (task) {
+                task.style.transition = 'transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1), opacity 0.3s ease-out';
+                task.style.transform = 'translateY(25px)';
+                task.style.setProperty('opacity', '0', 'important'); 
+            }
+        }, 50); 
+
+        // Phase 2: THE "DARK ZONE" SWAP (at 650ms)
+        setTimeout(() => {
+            if (typeof UI !== 'undefined') UI.setSuccessState(false); 
+
+            // Secretly switch the math and CSS to Orange Momentum while invisible!
+            this.momentumSeconds = backgroundSeconds;
+            this.isMomentum = true;
+            this.render(); 
+
+            ['displayHr', 'displayMin', 'displaySec'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.style.animation = 'none'; 
+                    el.classList.remove('tick-fall', 'tick-rise');
+                }
+            });
+
+            if (clock) {
+                clock.style.transition = 'none'; 
+                clock.style.transform = 'translateY(40px)'; 
+                void clock.offsetHeight; 
+            }
+            if (task) {
+                task.style.transition = 'none';
+                task.style.transform = 'translateY(25px)';
+                task.style.setProperty('opacity', '0', 'important');
+                void task.offsetHeight; 
+            }
+
+        }, 650); 
+
+        // Phase 3: INHALE (Rise as Momentum)
+        setTimeout(() => {
+            ['displayHr', 'displayMin', 'displaySec'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.animation = ''; 
+            });
+
+            if (clock) {
+                clock.style.transition = 'transform 0.8s cubic-bezier(0.19, 1, 0.22, 1), filter 0.8s ease, opacity 0.4s ease-in 0.15s';
+                clock.style.transform = 'translateY(0)';
+                clock.style.filter = 'blur(0px)';
+                clock.style.setProperty('opacity', '1', 'important');
+            }
+            if (task) {
+                task.style.transition = 'transform 0.8s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.4s ease-in 0.15s';
+                task.style.transform = 'translateY(0)';
+                task.style.setProperty('opacity', '1', 'important');
+            }
+
+            // Phase 4: CLEANUP & START 
+            setTimeout(() => {
+                if (clock) {
+                    clock.style.transition = '';
+                    clock.style.filter = '';
+                    clock.style.transform = ''; 
+                    clock.style.removeProperty('opacity'); 
+                }
+                if (task) {
+                    task.style.transition = '';
+                    task.style.transform = '';
+                    task.style.removeProperty('opacity');
+                }
+                
+                // Generate the Session ID and start the background counting!
+                this.sessionId = Date.now().toString(); 
+                Storage.set('blok_session_id', this.sessionId);
+                this.startMomentum(true); // 'true' skips the double-alarm sound
+                
+            }, 850); 
+
+        }, 750);
     },
 
     startMomentum(isResume = false) {
@@ -415,6 +517,9 @@ const Timer = {
         Storage.set(Storage.KEYS.TIMER_STATE, 'running');
         UI.setPlayState(true);
         UI.toggleReset(false);
+
+        // 🛑 THE ZERO-FRAME FIX: Force the UI to paint 00:00:00 before the 1-second delay begins!
+        this.render();
 
         this.interval = setInterval(() => {
             const now = Date.now();

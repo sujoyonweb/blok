@@ -6,6 +6,13 @@ const App = {
         document.body.addEventListener('click', () => Sound.init(), { once: true });
         
         Theme.init();
+        // --- NEW: THE ANTI-FLASH FIX ---
+        // Wait 50 milliseconds for the browser to render the correct colors, 
+        // then remove the straitjacket so the 5-second Sunset transitions work again.
+        setTimeout(() => {
+            document.body.classList.remove('preload');
+        }, 50);
+        
         Journal.init(); //must be before UI & Timer
         UI.init();
         Timer.init(); 
@@ -23,6 +30,15 @@ const App = {
                 if (isRunning) this.requestWakeLock();
             }
         });
+
+        // --- NEW: THE SPLASH HANDOFF ---
+        // The app is now fully loaded, styled, and clickable. Fade out the splash screen!
+        const splash = document.getElementById('blok-splash');
+        if (splash) {
+            splash.style.opacity = '0';
+            splash.style.visibility = 'hidden';
+            setTimeout(() => splash.remove(), 400); // Completely delete it from memory after fading
+        }
     },
 
     async requestWakeLock() {
