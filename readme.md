@@ -4,7 +4,7 @@
 
 **A premium, hardware-inspired focus timer for deep work.**
 
-[![BLOK App Preview](https://via.placeholder.com/1000x500/121212/A855F7?text=Replace+this+with+a+stunning+screenshot+of+BLOK)](https://instagram.com/sujoyonweb)
+[![BLOK App Preview](./assets/img/screenshot_blok_timer.png](https://instagram.com/sujoyonweb)
 
 *No subscriptions. No tracking. Just pure, uninterrupted focus.*
 
@@ -43,6 +43,6 @@ BLOK runs completely offline and installs natively directly from your browser—
 
 **Designed & Engineered by Sujoy**
 
-[![Instagram](https://img.shields.io/badge/Instagram-%23E4405F.svg?style=for-the-badge&logo=Instagram&logoColor=white)](https://instagram.com/sujoyonweb)
+[![Instagram](./assets/img/instagram_logo.png)](https://instagram.com/sujoyonweb)
 
 </div>
