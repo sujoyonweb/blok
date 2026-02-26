@@ -1,34 +1,48 @@
-# BLOK | Minimalist Focus Timer & Stopwatch
+<div align="center">
 
-A high-end, industrial-design productivity tool built for the web. 
-Designed with a focus on "Monotasking" and deep work.
+# ⬛ BLOK
 
-## 🎨 Design Philosophy
-- **Aesthetic:** Teenage Engineering inspired. Industrial, Matte Black (`#1C1C1E`) & Sage Green (`#4CAF50`).
-- **Typography:** JetBrains Mono (Monospaced, Technical).
-- **Interaction:** Haptic-feedback inspired animations, minimalist UI states.
+**A premium, hardware-inspired focus timer for deep work.**
 
-## 🚀 Features
-- **SPA Architecture:** Seamless switching between Timer and Stopwatch modes.
-- **Persistence:** Remembers your last used mode and timer settings via `localStorage`.
-- **Responsive:** Optimized for mobile (touch-friendly) and desktop.
-- **Timer:** - Standard Presets (Pomodoro, Short Break, Long Break, etc.).
-  - Custom Time support.
-  - "Focus Mode" (UI fades out during countdown).
-- **Stopwatch:** - Millisecond precision.
-  - Lap timing with "Flag" functionality.
-  - Dynamic button states (Reset/Lap logic).
+[![BLOK App Preview](https://via.placeholder.com/1000x500/121212/A855F7?text=Replace+this+with+a+stunning+screenshot+of+BLOK)](https://instagram.com/sujoyonweb)
 
-## 🛠 Tech Stack
-- **Core:** HTML5, CSS3, Vanilla JavaScript (ES6+).
-- **Storage:** LocalStorage API for state persistence.
-- **Icons:** Inline SVG for zero-latency loading.
+*No subscriptions. No tracking. Just pure, uninterrupted focus.*
 
-## 📂 Installation
-1. Clone the repo or download the folder.
-2. Open `index.html` in any modern browser.
-3. (Optional) For the best experience, host on GitHub Pages or a local server to avoid local file restrictions.
+</div>
 
-## 👤 Author
-**Sujoy**
-- Instagram: [@sujoyonweb](https://instagram.com/sujoyonweb)
+---
+
+## ⏾ Philosophy
+Built with the tactile satisfaction of physical hardware in mind. Inspired by industrial design and the Teenage Engineering aesthetic, BLOK features deep matte blacks (`#1C1C1E`), zero-latency segmented controls, and a strictly offline-first architecture. 
+
+## ⚡ Features
+- **Tactile Interface** — JetBrains Mono typography, haptic-synced mechanical clicks, and Apple-style spring physics.
+- **Momentum Mode** — Push past your goals with an electric violet, sub-pixel optimized glow for overtime tracking.
+- **Audiophile Engine** — Gapless BGM loops (Rain & Brown Noise) synchronized with your active timer.
+- **Bulletproof Data** — Absolute privacy. Your data never leaves your device. Export pristine `.csv` spreadsheets or securely Smart Merge `.json` backups across devices.
+- **Premium Gestures** — Swipe up to reveal settings; swipe down to effortlessly dismiss modals.
+
+## ⚙️ Architecture
+BLOK is an enterprise-grade Progressive Web App (PWA) engineered for maximum speed and a microscopic footprint.
+
+- **Stack:** 100% Vanilla HTML5, CSS3, and ES6+ JavaScript.
+- **Dependencies:** `0`. No React, no heavy frameworks.
+- **Offline Engine:** Custom V8 Service Worker utilizing a Stale-While-Revalidate caching strategy with silent background garbage collection.
+- **Native Desktop:** Utilizes `window-controls-overlay` to push the UI seamlessly into the macOS/Windows title bar.
+
+## 📥 Installation
+BLOK runs completely offline and installs natively directly from your browser—bypassing App Store bureaucracy entirely.
+
+* **iOS:** Open in Safari ⭢ Tap Share ⭢ `Add to Home Screen`.
+* **Android:** Open in Chrome ⭢ Tap `Install App`.
+* **Desktop:** Open in Chrome/Edge ⭢ Click the `🖥️ Install` icon in the address bar.
+
+---
+
+<div align="center">
+
+**Designed & Engineered by Sujoy**
+
+[![Instagram](https://img.shields.io/badge/Instagram-%23E4405F.svg?style=for-the-badge&logo=Instagram&logoColor=white)](https://instagram.com/sujoyonweb)
+
+</div>

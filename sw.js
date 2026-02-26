@@ -1,8 +1,7 @@
 // 1. Change this version number every time you push an update to GitHub!
-const CACHE_NAME = 'blok-cache-v15.6';
+const CACHE_NAME = 'blok-cache-v16.0';
 
 // 2. The exact list of files needed for offline mode
-// Note: We use './' (relative paths) so it works perfectly on GitHub Pages
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -29,8 +28,8 @@ const ASSETS_TO_CACHE = [
     
     // Media & Icons
     './assets/favicon.svg',
-    './assets/icon-192.png',  // <-- ADD THIS LINE
-    './assets/icon-512.png',  // <-- ADD THIS LINE
+    './assets/icon-192.png',
+    './assets/icon-512.png',
     './assets/rain.mp3',
 
     // Fonts (Local)
@@ -44,17 +43,18 @@ const ASSETS_TO_CACHE = [
 
 // --- INSTALL EVENT: Download everything into the Vault ---
 self.addEventListener('install', (event) => {
+    // SECURITY FIX: No self.skipWaiting() here! 
+    // This ensures active focus timers are never killed by a background update.
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then((cache) => {
                 console.log('[Service Worker] Caching all assets');
                 return cache.addAll(ASSETS_TO_CACHE);
             })
-            .then(() => self.skipWaiting()) // Instantly prepare the new worker
     );
 });
 
-// --- ACTIVATE EVENT: Delete the old Vaults ---
+// --- ACTIVATE EVENT: The Silent Garbage Collector ---
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((cacheNames) => {
@@ -62,7 +62,7 @@ self.addEventListener('activate', (event) => {
                 cacheNames.map((cacheName) => {
                     if (cacheName !== CACHE_NAME) {
                         console.log('[Service Worker] Deleting old cache:', cacheName);
-                        return caches.delete(cacheName);
+                        return caches.delete(cacheName); // Destroys old versions to free up phone storage
                     }
                 })
             );
@@ -73,7 +73,9 @@ self.addEventListener('activate', (event) => {
 
 // --- FETCH EVENT: Instant Boot (Stale-While-Revalidate) ---
 self.addEventListener('fetch', (event) => {
-    // Only handle standard GET requests
+    // SECURITY FIX: Strict Origin Shield
+    // This prevents Chrome extensions or third-party APIs from polluting the cache memory
+    if (!event.request.url.startsWith(self.location.origin)) return;
     if (event.request.method !== 'GET') return;
 
     event.respondWith(
@@ -92,15 +94,14 @@ self.addEventListener('fetch', (event) => {
             });
 
             // 2. INSTANT BOOT: Return the cached version immediately if we have it!
-            // Only wait for the network if this is the absolute first time they opened the app.
             return cachedResponse || fetchPromise;
         })
     );
 });
 
-// --- NEW: Allow the UI Toast to force an immediate update ---
+// --- ALLOW THE UI TOAST TO FORCE AN IMMEDIATE UPDATE ---
 self.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'SKIP_WAITING') {
-        self.skipWaiting();
+        self.skipWaiting(); // Only triggered when the user explicitly clicks the "Update Ready" toast
     }
 });
