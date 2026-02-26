@@ -73,11 +73,12 @@ const UI = {
         if (!document.fullscreenElement) {
             // Ask the browser to expand the whole HTML document
             document.documentElement.requestFullscreen().catch(err => {
-                console.log(`Error attempting to enable fullscreen: ${err.message}`);
+                console.log(`Fullscreen blocked: ${err.message}`);
             });
         } else {
+            // Safely check if the browser supports exiting fullscreen before firing it
             if (document.exitFullscreen) {
-                document.exitFullscreen();
+                document.exitFullscreen().catch(() => console.log("Exit fullscreen ignored by browser."));
             }
         }
     },

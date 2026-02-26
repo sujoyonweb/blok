@@ -31,8 +31,10 @@ class SoundEngine {
 
         if (!this.ctx) return; // Failsafe
         
-        // Browsers pause audio contexts until user interaction. This wakes it up.
-        if (this.ctx.state === 'suspended') this.ctx.resume();
+        // Browsers pause audio contexts until user interaction. This wakes it up safely.
+        if (this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => console.log("Audio waiting for user interaction."));
+        }
 
         const now = this.ctx.currentTime;
 

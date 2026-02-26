@@ -1,5 +1,5 @@
 // 1. Change this version number every time you push an update to GitHub!
-const CACHE_NAME = 'blok-cache-v16.0';
+const CACHE_NAME = 'blok-cache-v1.0.0';
 
 // 2. The exact list of files needed for offline mode
 const ASSETS_TO_CACHE = [

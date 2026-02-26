@@ -4,43 +4,70 @@ const Journal = {
     _compiledDict: null,
 
     // THE MASTER DICTIONARY (3-Bucket Architecture)
-    // Completely decoupled into individual, independent subjects for accurate tracking
+    // ORDERED BY PRIORITY: Hyper-specific subjects at the top, broad "safety net" subjects at the bottom.
     Dictionary: {
         "📚 Study": {
-            "Mathematics": ["math", "maths", "algebra", "calculus", "geometry", "trigonometry", "topology", "arithmetic", "quant", "quantitative", "statistics", "probability", "discrete math"],
-            "Physics": ["physics", "kinematics", "thermodynamics", "optics", "mechanics", "electromagnetism", "quantum", "astronomy", "astrophysics"],
-            "Chemistry": ["chemistry", "organic chemistry", "inorganic chemistry", "physical chemistry", "biochemistry"],
-            "Biology": ["biology", "zoology", "botany", "anatomy", "physiology", "pathology", "ecology"],
-            "Genetics": ["genetics", "dna", "heredity", "mutation"],
-            "Medicine": ["medicine", "surgery", "mbbs", "neet", "pharmacology", "nursing", "clinical", "pharmacy", "dentistry"],
-            "Accounting": ["accounting", "accountancy", "audit", "tax", "taxation"],
-            "Economics": ["economics", "macroeconomics", "microeconomics", "economy"],
-            "Business": ["business", "commerce", "mba", "marketing", "management", "corporate", "supply chain"],
-            "Finance": ["finance", "banking", "investment", "portfolio"],
-            "History": ["history", "ancient history", "medieval history", "modern history", "world history", "archaeology"],
-            "Geography": ["geography", "human geography", "physical geography", "mapping", "gis"],
-            "Polity": ["polity", "constitution", "civics", "governance", "public administration"],
+            // Tier 1: Highly Niche & Technical (Unlikely to share words)
+            "AI & ML": ["artificial intelligence", "ai", "machine learning", "ml", "deep learning", "robotics"],
+            "Computer Science": ["computer science", "cs", "computing and it", "algorithm", "data structures", "dsa", "os", "operating system", "dbms", "networking", "cybersecurity", "cryptography", "compiler"],
+            "Genetics": ["genetics", "dna", "heredity", "mutation", "evolution"],
+            "Medicine": ["medicine", "surgery", "mbbs", "neet", "pharmacology", "clinical", "pharmacy", "dentistry", "usmle", "medical", "epidemiology"],
+            "Nursing": ["nursing", "nursing and healthcare", "healthcare", "patient care", "health and social care", "health sciences"],
+            "Electronics": ["electronic engineering", "electrical engineering", "circuit design", "microelectronics"],
+            "Engineering": ["engineering", "mechanical engineering", "civil engineering", "aerospace", "chemical engineering"],
+            "Accounting": ["accounting", "accountancy", "audit", "tax", "taxation", "cpa"],
+            "Finance": ["finance", "banking", "investment", "portfolio", "cfa"],
             "Law": ["law", "legal", "jurisprudence", "criminal law", "civil law", "clat", "llb", "corporate law", "litigation"],
-            "Sociology": ["sociology", "anthropology", "society", "criminology"],
-            "Psychology": ["psychology", "behavioral", "cognitive", "therapy", "psychiatry"],
-            "Philosophy": ["philosophy", "ethics", "theology", "logic"],
-            "English": ["english", "grammar", "vocab", "vocabulary", "comprehension", "reading", "essay", "eng"],
-            "Literature": ["literature", "poetry", "prose", "fiction"],
-            "Languages": ["linguistics", "language", "translation", "spanish", "french", "german", "hindi", "sanskrit"],
-            "Computer Science": ["computer science", "cs", "algorithm", "data structures", "dsa", "os", "operating system", "dbms", "networking", "cybersecurity"],
-            "General Studies (GS)": ["gs", "general studies", "gk", "general knowledge", "current affairs"],
-            "Aptitude & Reasoning": ["aptitude", "reasoning", "syllogism", "puzzle", "logical reasoning"],
-            "Earth Sciences": ["earth science", "geology", "meteorology", "oceanography", "environmental science"],
-            "Fine Arts": ["arts", "fine arts", "painting", "sculpture", "music", "theater", "film"],
-            "Architecture & Design": ["architecture", "design", "drawing", "cad", "drafting"]
+            
+            // Tier 2: Standard Core Subjects
+            "Economics": ["economics", "eco", "macroeconomics", "microeconomics", "economy", "econometrics", "game theory", "fiscal policy"],
+            "Business": ["business", "business and management", "commerce", "mba", "management", "corporate", "supply chain", "bba", "entrepreneurship"],
+            "Marketing": ["marketing", "sales", "branding", "seo", "social media marketing"],
+            "Chemistry": ["chemistry", "chem", "organic chemistry", "inorganic chemistry", "physical chemistry", "biochemistry", "polymers", "stoichiometry", "titration", "thermo", "kinetics", "spectroscopy", "molecular"],
+            "Physics": ["physics", "phys", "kinematics", "thermodynamics", "optics", "mechanics", "electromagnetism", "quantum", "astronomy", "astrophysics", "relativity", "fluid mechanics", "dynamics", "acoustics", "nuclear physics"],
+            "Biology": ["biology", "bio", "zoology", "botany", "anatomy", "physiology", "pathology", "ecology", "cell division", "mitosis", "meiosis", "science", "marine biology", "biotech"],
+            "Psychology": ["psychology", "psych", "behavioral", "cognitive", "neuropsychology", "clinical psychology", "developmental psychology"],
+            "Mental Health": ["mental health", "counselling", "therapy", "psychiatry", "health and wellbeing"],
+            "Sociology": ["sociology", "anthropology", "society", "social sciences", "demography", "gender studies", "cultural studies", "arts and humanities"],
+            "Social Work": ["social work", "criminology", "social care"],
+            "Polity": ["polity", "constitution", "civics", "governance", "public administration", "politics", "political science"],
+            "History": ["history", "ancient history", "medieval history", "modern history", "world history", "archaeology", "cold war", "renaissance", "industrial revolution", "antiquity", "art history"],
+            "Geography": ["geography", "geo", "human geography", "physical geography", "mapping", "gis", "topography", "climatology"],
+            "Environment": ["environment", "environmental science", "earth science", "geology", "meteorology", "oceanography"],
+            "Mathematics": ["math", "maths", "mathematics", "algebra", "calculus", "geometry", "trigonometry", "topology", "arithmetic", "quant", "quantitative", "discrete math", "set theory", "integration", "derivatives", "matrix", "matrices", "vectors", "differential equations", "linear algebra"],
+            "Statistics": ["statistics", "stats", "probability", "data analysis"],
+            "Philosophy": ["philosophy", "ethics", "logic", "epistemology", "metaphysics"],
+            "Religion": ["religious studies", "theology", "mythology", "religion"],
+            "Languages": ["linguistics", "language", "languages", "translation", "spanish", "french", "german", "hindi", "sanskrit", "mandarin", "japanese", "korean", "arabic", "latin"],
+            
+            // Tier 3: Broad Catch-Alls
+            "Literature": ["literature", "lit", "poetry", "prose", "fiction", "novel", "classical studies"],
+            "Writing": ["writing", "creative writing", "journalism", "composition", "copywriting"],
+            "Design": ["design", "graphic design", "interior design", "cad", "drafting", "textiles", "fashion"],
+            "Education": ["education", "early years", "pedagogy", "teaching", "combined studies"],
+            "Arts": ["arts", "fine art", "painting", "sculpture", "drawing", "illustration"],
+            "Media": ["media", "film", "film and media", "theater", "photography", "visual communications", "visual arts"],
+            "Aptitude": ["aptitude", "reasoning", "syllogism", "puzzle", "logical reasoning", "lr", "di", "data interpretation"],
+            "English": ["english", "eng", "grammar", "vocab", "vocabulary", "comprehension", "reading", "essay"],
+            "General Studies": ["gs", "general studies", "gk", "general knowledge", "current affairs", "upsc", "ssc"]
         },
         "💼 Work": {
-            "Software & Tech": ["code", "coding", "programming", "java", "python", "c++", "cpp", "c#", "javascript", "js", "react", "html", "css", "node", "frontend", "backend", "fullstack", "bug", "debug", "dev", "project", "git", "api", "sql", "database", "machine learning", "ml", "ai", "data science"],
-            "Admin & Operations": ["email", "meeting", "write", "draft", "report", "edit", "planning", "excel", "presentation", "research", "admin", "strategy", "review", "proposal", "client", "pitch", "sales"],
-            "Creative Work": ["designing", "figma", "video editing", "premiere", "photoshop", "illustrator", "animation", "content creation", "youtube", "blogging", "seo"]
+            // Highly Specific Professions
+            "Software": ["code", "coding", "programming", "software engineering", "java", "python", "c++", "cpp", "c#", "javascript", "js", "typescript", "react", "html", "css", "node", "frontend", "backend", "fullstack", "bug", "debug", "dev", "project", "git", "api", "sql", "database", "refactor", "deployment", "docker", "aws", "cloud", "sysadmin", "qa", "testing"],
+            "Clinical": ["patient care", "charting", "rounds", "diagnostics", "lab work", "clinical trials", "therapy session"],
+            "Trades": ["construction", "carpentry", "plumbing", "electrical", "welding", "manufacturing", "mechanic", "automotive", "repair", "maintenance", "architecture", "surveying", "farming", "agriculture"],
+            "Creative": ["designing", "ui", "ux", "ui/ux", "figma", "video editing", "premiere", "photoshop", "illustrator", "animation", "content creation", "youtube", "blogging", "render", "export", "podcast"],
+            "HR & Ops": ["hr", "recruiting", "payroll", "logistics", "inventory", "management"],
+            // Broadest Catch-All Work
+            "Administration": ["email", "meeting", "write", "draft", "report", "edit", "planning", "excel", "presentation", "deck", "research", "admin", "strategy", "review", "proposal", "client", "pitch", "sync", "onboarding"]
         },
         "🎯 Others": {
-            "Mindfulness & Personal": ["meditate", "journal", "breathe", "reflection", "plan", "organize", "read", "book", "chores", "hobby", "music practice", "workout", "fitness"]
+            "Fitness": ["sport and fitness", "sport", "fitness", "gym", "workout", "yoga", "running", "jogging", "cycling", "swimming", "lifting", "cardio", "pilates", "martial arts", "stretch", "hiking", "walking"],
+            "Mindfulness": ["meditate", "meditation", "journal", "journaling", "breathe", "reflection", "prayer", "spiritual"],
+            "Hobbies": ["hobby", "music", "music practice", "guitar", "piano", "singing", "gaming", "video games", "board games", "woodworking", "knitting", "sewing", "crafts", "diy", "gardening", "baking", "cooking"],
+            // Broadest Catch-All Life Items
+            "Life Admin": ["plan", "organize", "chores", "cleaning", "cook", "groceries", "finances", "budgeting", "taxes", "errands", "laundry", "driving", "commute", "packing", "moving"],
+            "Reading": ["read", "book", "reading"]
         }
     },
 

@@ -119,19 +119,10 @@ const Stopwatch = {
     },
 
     render(returnStr = false) {
-        // Calculate components
         const totalSec = Math.floor(this.elapsed / 1000);
-        const h = Math.floor(totalSec / 3600);
-        const m = Math.floor((totalSec % 3600) / 60);
-        const s = totalSec % 60;
-        // Optional: Centiseconds can be added if you want extreme precision shown
-        // const ms = Math.floor((this.elapsed % 1000) / 10); 
         
-        const fmt = { 
-            h: h.toString().padStart(2, '0'), 
-            m: m.toString().padStart(2, '0'), 
-            s: s.toString().padStart(2, '0') 
-        };
+        // Let the global Utils engine do the math for us!
+        const fmt = Utils.fmtTime(totalSec); 
         
         if (returnStr) return `${fmt.h}:${fmt.m}:${fmt.s}`;
         UI.updateClock(fmt);

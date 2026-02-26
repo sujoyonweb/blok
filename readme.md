@@ -4,7 +4,7 @@
 
 **A premium, hardware-inspired focus timer for deep work.**
 
-[![BLOK App Preview](./assets/img/screenshot_blok_timer.png](https://instagram.com/sujoyonweb)
+[![BLOK App Preview](./assets/img/screenshot_blok_timer.png)](https://instagram.com/sujoyonweb)
 
 *No subscriptions. No tracking. Just pure, uninterrupted focus.*
 
