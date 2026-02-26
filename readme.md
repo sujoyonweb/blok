@@ -45,5 +45,4 @@ BLOK runs completely offline and installs natively directly from your browser—
 
 [![Instagram](./assets/img/instagram_logo.png)](https://instagram.com/sujoyonweb)
 
-
 </div>

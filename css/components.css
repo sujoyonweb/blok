@@ -392,6 +392,7 @@
     border-color: var(--accent-color);
     color: var(--accent-color);
     font-weight: 600;
+    pointer-events: auto;
 }
 
 /* =========================================
