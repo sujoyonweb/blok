@@ -49,7 +49,9 @@ const Journal = {
             "Media": ["media", "film", "film and media", "theater", "photography", "visual communications", "visual arts"],
             "Aptitude": ["aptitude", "reasoning", "syllogism", "puzzle", "logical reasoning", "lr", "di", "data interpretation"],
             "English": ["english", "eng", "grammar", "vocab", "vocabulary", "comprehension", "reading", "essay"],
-            "General Studies": ["gs", "general studies", "gk", "general knowledge", "current affairs", "upsc", "ssc"]
+            "General Studies": ["gs", "general studies", "gk", "general knowledge", "current affairs", "upsc", "ssc"],
+            "Other Studies": ["study", "studying", "homework", "exam prep", "revision", "assignment", "class", "coursework"],
+            "Other Work": ["work", "working", "job", "shift", "office", "task", "project"]
         },
         "💼 Work": {
             // Highly Specific Professions
