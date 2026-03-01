@@ -1025,7 +1025,7 @@ const UI = {
             if (focusLogs.length === 0) {
                 journalEl.innerHTML = '<div style="color: var(--text-dim); font-size:13px; padding-bottom: 20px;">No sessions logged yet.</div>';
             } else {
-                journalEl.innerHTML = focusLogs.slice(0, 5).map(log => {
+                journalEl.innerHTML = focusLogs.slice(0, 20).map(log => {
                     let displayTask = log.task;
                     
                     // 🛑 THE FIX: If it's uncategorized, just show "Focus Session" (or whatever they typed)
