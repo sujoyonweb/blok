@@ -217,6 +217,10 @@
     overflow-y: auto;
     scrollbar-width: none;
 }
+/* Gives the Data/Insights modal more horizontal breathing room */
+.stats-modal-box {
+    max-width: 440px;
+}
 .modal::-webkit-scrollbar {
     display: none;
 }
