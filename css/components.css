@@ -967,3 +967,61 @@ body.mode-break.is-deep-focus .controls-section .progress-container {
 }
 .btn-sync:hover { background: var(--btn-hover); color: var(--text-main); border-color: var(--text-dim); }
 .sync-icon { font-size: 15px; color: var(--accent-color); opacity: 0.9; }
+
+/* ==========================================
+   📦 SYNC DROP ZONE UI
+   ========================================== */
+.drop-zone-box {
+    border: 1px dashed var(--border-color);
+    border-radius: 12px;
+    padding: 4px 0;
+    margin-top: 5px;
+    transition: all 0.25s cubic-bezier(0.4, 0.0, 0.2, 1);
+    background: rgba(255, 255, 255, 0.01);
+    position: relative;
+}
+
+.drop-zone-box.drag-active {
+    border-color: var(--accent-color);
+    background: rgba(76, 175, 80, 0.05); 
+    transform: scale(1.02);
+}
+
+.drop-zone-divider {
+    height: 1px;
+    background: var(--border-color);
+    margin: 0 16px;
+    opacity: 0.4;
+}
+
+.drop-zone-hint {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: center;
+    margin-top: 4px;
+    margin-bottom: 12px;
+    font-family: var(--font-mono);
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.btn-sync-ghost {
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 16px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+}
+.btn-sync-ghost:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
