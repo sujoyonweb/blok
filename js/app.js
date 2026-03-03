@@ -160,6 +160,70 @@ const App = {
         if (isRunning) this.requestWakeLock(); else this.releaseWakeLock();
     },
 
+    // ==========================================
+    // 🗄️ MASTER DATA MERGE FUNCTION (Extracts UI logic)
+    // ==========================================
+    processSyncData(jsonText) {
+        try {
+            const importedData = JSON.parse(jsonText);
+            let currentHistory = Storage.get(Storage.KEYS.HISTORY, {});
+            
+            // Merge History (Keep the highest value for each day)
+            if (importedData.history) {
+                for (const [date, seconds] of Object.entries(importedData.history)) {
+                    if (!currentHistory[date] || importedData.history[date] > currentHistory[date]) {
+                        currentHistory[date] = importedData.history[date];
+                    }
+                }
+                Storage.set(Storage.KEYS.HISTORY, currentHistory);
+                
+                const todayStr = new Date().toDateString();
+                const todayTotal = currentHistory[todayStr] || 0;
+                Storage.set(Storage.KEYS.DAILY_TOTAL, todayTotal);
+                if (typeof Timer !== 'undefined') {
+                    Timer.dailySeconds = todayTotal;
+                    UI.updateStats(todayTotal);
+                    UI.updateRing(todayTotal, Timer.dailyGoal);
+                }
+            }
+
+            // Merge Journal, Remove Duplicates, Split into Active/Archive
+            if (importedData.journal && Array.isArray(importedData.journal)) {
+                const currentLogs = typeof Journal !== 'undefined' ? Journal.getAllLogs() : [];
+                const combined = [...currentLogs, ...importedData.journal];
+                
+                const uniqueMap = new Map();
+                combined.forEach(log => {
+                    if (!uniqueMap.has(log.id)) uniqueMap.set(log.id, log);
+                });
+                
+                let finalJournal = Array.from(uniqueMap.values());
+                finalJournal.sort((a, b) => b.id - a.id); // Newest first
+                
+                const MAX = typeof Journal !== 'undefined' ? Journal.MAX_ENTRIES : 500;
+                const active = finalJournal.slice(0, MAX);
+                const archive = finalJournal.slice(MAX);
+                
+                Storage.set(Storage.KEYS.JOURNAL_LOG, active);
+                Storage.set(Storage.KEYS.JOURNAL_ARCHIVE, archive);
+            }
+
+            Sound.play('click');
+            UI.showToast("Data merged successfully!");
+            
+            // Force Insights tab to recalculate
+            if (typeof UI.renderInsights === 'function') {
+                const btnWeek = document.getElementById('btnRangeWeek');
+                const isWeek = btnWeek && btnWeek.classList.contains('active');
+                UI.renderInsights(isWeek ? 'week' : 'today');
+            }
+
+        } catch (err) {
+            alert("Invalid backup file or JSON format.");
+            console.error(err);
+        }
+    },
+
     bindEvents() {
         document.getElementById('tabTimer').onclick = () => { Sound.play('click'); this.switchMode('timer'); };
         document.getElementById('tabStopwatch').onclick = () => { Sound.play('click'); this.switchMode('stopwatch'); };
@@ -585,75 +649,83 @@ const App = {
         // 3. JSON SMART MERGE (ACTIVE vs COLD STORAGE)
         const importInput = document.getElementById('importSyncFile');
         if (importInput) {
+            // Original Standard Button Click
             importInput.onchange = (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
 
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    try {
-                        const importedData = JSON.parse(event.target.result);
-                        let currentHistory = Storage.get(Storage.KEYS.HISTORY, {});
-                        
-                        // Merge History (Keep the highest value for each day)
-                        if (importedData.history) {
-                            for (const [date, seconds] of Object.entries(importedData.history)) {
-                                if (!currentHistory[date] || importedData.history[date] > currentHistory[date]) {
-                                    currentHistory[date] = importedData.history[date];
-                                }
-                            }
-                            Storage.set(Storage.KEYS.HISTORY, currentHistory);
-                            
-                            const todayStr = new Date().toDateString();
-                            const todayTotal = currentHistory[todayStr] || 0;
-                            Storage.set(Storage.KEYS.DAILY_TOTAL, todayTotal);
-                            if (typeof Timer !== 'undefined') {
-                                Timer.dailySeconds = todayTotal;
-                                UI.updateStats(todayTotal);
-                                UI.updateRing(todayTotal, Timer.dailyGoal);
-                            }
-                        }
-
-                        // Merge Journal, Remove Duplicates, Split into Active/Archive
-                        if (importedData.journal && Array.isArray(importedData.journal)) {
-                            const currentLogs = typeof Journal !== 'undefined' ? Journal.getAllLogs() : [];
-                            const combined = [...currentLogs, ...importedData.journal];
-                            
-                            const uniqueMap = new Map();
-                            combined.forEach(log => {
-                                if (!uniqueMap.has(log.id)) uniqueMap.set(log.id, log);
-                            });
-                            
-                            let finalJournal = Array.from(uniqueMap.values());
-                            finalJournal.sort((a, b) => b.id - a.id); // Newest first
-                            
-                            const MAX = typeof Journal !== 'undefined' ? Journal.MAX_ENTRIES : 500;
-                            const active = finalJournal.slice(0, MAX);
-                            const archive = finalJournal.slice(MAX);
-                            
-                            Storage.set(Storage.KEYS.JOURNAL_LOG, active);
-                            Storage.set(Storage.KEYS.JOURNAL_ARCHIVE, archive);
-                        }
-
-                        Sound.play('click');
-                        UI.showToast("Data merged successfully!");
-                        
-                        // Force Insights tab to recalculate
-                        if (typeof UI.renderInsights === 'function') {
-                            const btnWeek = document.getElementById('btnRangeWeek');
-                            const isWeek = btnWeek && btnWeek.classList.contains('active');
-                            UI.renderInsights(isWeek ? 'week' : 'today');
-                        }
-
-                    } catch (err) {
-                        alert("Invalid backup file.");
-                        console.error(err);
-                    }
-                    importInput.value = ''; 
+                    this.processSyncData(event.target.result);
+                    importInput.value = ''; // Reset input to allow re-uploading the same file
                 };
                 reader.readAsText(file);
             };
+
+            // --- NEW: DRAG AND DROP ZONE LOGIC ---
+            // Target the entire new dashed box
+            const dropZone = document.getElementById('syncDropZone');
+            
+            if (dropZone) {
+                dropZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    // Turn on the green glowing border
+                    dropZone.classList.add('drag-active');
+                });
+                
+                dropZone.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    // Turn off the glowing border
+                    dropZone.classList.remove('drag-active');
+                });
+                
+                dropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    // Turn off the glowing border
+                    dropZone.classList.remove('drag-active');
+                    
+                    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                        const file = e.dataTransfer.files[0];
+                        if (file.type === "application/json" || file.name.endsWith(".json")) {
+                            const reader = new FileReader();
+                            reader.onload = (event) => this.processSyncData(event.target.result);
+                            reader.readAsText(file);
+                        } else {
+                            UI.showToast("Please drop a valid .json backup file");
+                        }
+                    }
+                });
+            }
         }
+
+        // --- NEW: GLOBAL COPY & PASTE LISTENER ---
+        window.addEventListener('paste', (e) => {
+            // Safety Gate: Don't intercept if user is currently typing a task
+            const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+            if (activeTag === 'input' || activeTag === 'textarea' || document.activeElement.isContentEditable) {
+                return;
+            }
+
+            if (!e.clipboardData) return;
+
+            // Scenario A: They pasted an actual .json file icon
+            if (e.clipboardData.files && e.clipboardData.files.length > 0) {
+                const file = e.clipboardData.files[0];
+                if (file.type === "application/json" || file.name.endsWith(".json")) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => this.processSyncData(event.target.result);
+                    reader.readAsText(file);
+                }
+            } 
+            // Scenario B: They pasted raw JSON text directly
+            else {
+                const pastedText = e.clipboardData.getData('text');
+                // Quick validation: Only attempt to parse if it looks like an object
+                if (pastedText && pastedText.trim().startsWith('{')) {
+                    this.processSyncData(pastedText);
+                }
+            }
+        });
 
         // ==========================================
         // 🖥️ FULL SCREEN FEATURES (v10.4)
